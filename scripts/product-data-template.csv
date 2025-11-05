@@ -1,0 +1,8 @@
+name,brand,category,barcode,description,lead_ppb,arsenic_ppb,cadmium_ppb,mercury_ppb,lab_name,test_date,report_url
+"Gerber Rice Single Grain Cereal","Gerber","cereal","015000076184","Single grain rice cereal for babies",3.5,85.2,2.1,0.3,"Healthy Babies Bright Futures","2019-09-25","https://www.healthybabyfood.org/report"
+"Beech-Nut Naturals Stage 1 Pear","Beech-Nut","puree","052800450134","Pear puree",1.5,2.8,0.6,0.1,"Consumer Reports","2023-03-15",""
+"Happy Baby Clearly Crafted Apples","Happy Baby","puree","852697001439","Organic apple puree",1.2,2.1,0.5,0.1,"Independent Food Testing Lab","2023-06-20",""
+"Plum Organics Stage 2 Carrot","Plum Organics","puree","846675000101","Organic carrot puree",2.3,4.5,1.1,0.1,"","2023-08-10",""
+"Earth's Best Organic Sweet Potato","Earth's Best","puree","023923302051","Organic sweet potato puree",5.9,10.7,2.4,0.1,"","",""
+"Gerber Puffs Banana","Gerber","snack","015000073466","Banana flavored puffs",2.8,35.4,1.6,0.2,"","",""
+"Parent's Choice Apple Juice","Parent's Choice","juice","078742119801","100% apple juice for toddlers",4.5,5.8,1.0,0.2,"","",""

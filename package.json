@@ -1,0 +1,49 @@
+{
+  "name": "safebaby",
+  "version": "1.0.0",
+  "description": "Baby food safety rating app - helping parents make informed decisions",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "seed": "node scripts/seed.js",
+    "seed:enhanced": "node scripts/seed-enhanced.js",
+    "scrape:ab899": "node scripts/scrape-ab899.js",
+    "import:csv": "node scripts/import-csv.js"
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^2.4.0",
+    "@supabase/ssr": "^0.0.10",
+    "@supabase/supabase-js": "^2.39.0",
+    "axios": "^1.13.2",
+    "cheerio": "^1.1.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "csv-parse": "^6.1.0",
+    "date-fns": "^3.0.6",
+    "html5-qrcode": "^2.3.8",
+    "lucide-react": "^0.294.0",
+    "next": "^15.0.0",
+    "next-pwa": "^5.6.0",
+    "posthog-js": "^1.285.1",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-hot-toast": "^2.4.1",
+    "react-qr-reader": "^3.0.0-beta-1",
+    "stripe": "^14.10.0",
+    "tailwind-merge": "^2.2.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "dotenv": "^17.2.3",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^15.0.0",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}
