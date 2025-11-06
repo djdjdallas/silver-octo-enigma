@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background with rounded corners -->
+  <rect width="128" height="128" rx="25.6" fill="url(#grad)"/>
+
+  <!-- Shield with checkmark -->
+  <g transform="translate(19.2, 19.2)">
+    <path d="M 44.8 8.959999999999999 L 17.919999999999998 26.88 V 44.8 C 17.919999999999998 67.19999999999999 31.359999999999996 82.432 44.8 89.6 C 58.239999999999995 82.432 71.67999999999999 67.19999999999999 71.67999999999999 44.8 V 26.88 L 44.8 8.959999999999999 Z"
+          fill="white"/>
+
+    <!-- Checkmark -->
+    <path d="M 35.839999999999996 53.76 L 26.88 44.8 L 31.359999999999996 40.32 L 35.839999999999996 44.8 L 58.239999999999995 26.88 L 62.71999999999999 31.359999999999996 L 35.839999999999996 53.76 Z"
+          fill="#10b981"/>
+  </g>
+</svg>
