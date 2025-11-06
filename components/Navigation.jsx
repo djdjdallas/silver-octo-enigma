@@ -51,7 +51,24 @@ export default function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary to-primary-600 rounded-2xl shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
-              <Icons.shield className="w-7 h-7 text-white" />
+              {/* Shield with checkmark matching favicon */}
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-white"
+              >
+                <path
+                  d="M12 2L4 6V11C4 16 8 20.5 12 22C16 20.5 20 16 20 11V6L12 2Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M10 14L7 11L8.5 9.5L10 11L15.5 5.5L17 7L10 14Z"
+                  fill="#10b981"
+                />
+              </svg>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-600 bg-clip-text text-transparent">
               SafeBaby
