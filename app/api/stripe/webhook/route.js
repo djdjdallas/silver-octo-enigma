@@ -37,23 +37,46 @@ export async function POST(request) {
       const customerId = session.customer;
 
       if (userId) {
-        // Update user profile with subscription info
-        const subscription = await stripe.subscriptions.retrieve(session.subscription);
-        const expiresAt = new Date(subscription.current_period_end * 1000);
+        // Check if this is a subscription or one-time payment
+        if (session.mode === 'subscription' && session.subscription) {
+          // Handle subscription
+          const subscription = await stripe.subscriptions.retrieve(session.subscription);
+          const expiresAt = new Date(subscription.current_period_end * 1000);
 
-        const { error } = await supabase
-          .from('user_profiles')
-          .update({
-            subscription_tier: 'pro',
-            subscription_expires_at: expiresAt.toISOString(),
-            stripe_customer_id: customerId,
-          })
-          .eq('id', userId);
+          const { error } = await supabase
+            .from('user_profiles')
+            .update({
+              subscription_tier: 'pro',
+              subscription_expires_at: expiresAt.toISOString(),
+              stripe_customer_id: customerId,
+            })
+            .eq('id', userId);
 
-        if (error) {
-          console.error('Error updating user profile:', error);
-        } else {
-          console.log('User subscription activated:', userId);
+          if (error) {
+            console.error('Error updating user profile:', error);
+          } else {
+            console.log('User subscription activated:', userId);
+          }
+        } else if (session.mode === 'payment') {
+          // Handle one-time payment (lifetime access)
+          // Set expiration to far future date (e.g., 100 years from now)
+          const lifetimeExpiry = new Date();
+          lifetimeExpiry.setFullYear(lifetimeExpiry.getFullYear() + 100);
+
+          const { error } = await supabase
+            .from('user_profiles')
+            .update({
+              subscription_tier: 'pro',
+              subscription_expires_at: lifetimeExpiry.toISOString(),
+              stripe_customer_id: customerId,
+            })
+            .eq('id', userId);
+
+          if (error) {
+            console.error('Error updating user profile for lifetime access:', error);
+          } else {
+            console.log('User lifetime access activated:', userId);
+          }
         }
       }
       break;

@@ -15,7 +15,7 @@ const PLANS = [
   {
     id: 'monthly',
     name: 'Monthly',
-    price: 4.00,
+    price: 5.99,
     interval: 'month',
     priceId: process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID,
     description: 'Billed monthly',
@@ -24,12 +24,22 @@ const PLANS = [
   {
     id: 'annual',
     name: 'Annual',
-    price: 47.00,
+    price: 59.99,
     interval: 'year',
     priceId: process.env.NEXT_PUBLIC_STRIPE_ANNUAL_PRICE_ID,
     description: 'Billed yearly',
-    savings: '20% off',
+    savings: '17% off',
     popular: true,
+  },
+  {
+    id: 'lifetime',
+    name: 'Lifetime Access',
+    price: 149.99,
+    interval: 'one-time',
+    priceId: process.env.NEXT_PUBLIC_STRIPE_LIFETIME_PRICE_ID,
+    description: 'Pay once, own forever',
+    savings: 'Best Value',
+    badge: 'Most Popular',
   },
 ];
 
@@ -111,6 +121,9 @@ export default function UpgradePage() {
     setLoading(true);
 
     try {
+      // Determine checkout mode based on plan interval
+      const checkoutMode = plan.interval === 'one-time' ? 'payment' : 'subscription';
+
       // Call API to create Stripe checkout session
       const response = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
@@ -121,6 +134,7 @@ export default function UpgradePage() {
           priceId: plan.priceId,
           userId: user.id,
           email: user.email,
+          mode: checkoutMode,
         }),
       });
 
@@ -159,17 +173,17 @@ export default function UpgradePage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-16">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
           {PLANS.map((plan) => (
             <Card
               key={plan.id}
               className={`relative ${
-                plan.popular ? 'border-2 border-primary-500 shadow-lg' : ''
+                plan.popular || plan.badge ? 'border-2 border-primary-500 shadow-lg' : ''
               } ${selectedPlan === plan.id ? 'ring-2 ring-primary-500' : ''}`}
             >
-              {plan.popular && (
+              {(plan.popular || plan.badge) && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-primary-500">Most Popular</Badge>
+                  <Badge className="bg-primary-500">{plan.badge || 'Most Popular'}</Badge>
                 </div>
               )}
 

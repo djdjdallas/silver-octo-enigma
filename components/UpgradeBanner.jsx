@@ -22,7 +22,7 @@ export default function UpgradeBanner() {
                 Unlock safety scores and rankings
               </p>
               <p className="text-xs text-primary-100 hidden sm:block">
-                Get Pro for just $4/month to see complete safety ratings
+                Get Pro for just $5.99/month to see complete safety ratings
               </p>
             </div>
           </div>

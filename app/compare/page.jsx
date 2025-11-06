@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import ProductSelector from '@/components/ProductSelector';
 import ComparisonTable from '@/components/ComparisonTable';
+import AIComparisonInsights from '@/components/AIComparisonInsights';
 import { validateComparisonLimit, generateComparisonShareLink, parseComparisonQuery, getComparisonSummary } from '@/lib/comparison';
 import { getUserTier } from '@/lib/utils';
 import {
@@ -347,6 +348,17 @@ export default function ComparePage() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* AI Comparison Insights */}
+        {canCompare && (
+          <div className="mb-8">
+            <AIComparisonInsights
+              products={selectedProducts}
+              contaminants={contaminants}
+              userTier={userTier}
+            />
+          </div>
         )}
 
         {/* Comparison Table */}

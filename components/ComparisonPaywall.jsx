@@ -17,11 +17,13 @@ export default function ComparisonPaywall({ currentProduct, variant = 'button' }
   // Button variant - shown on product pages
   if (variant === 'button') {
     if (isPro) {
-      // For Pro users, show functional compare button
+      // For Pro users, navigate to compare page with current product
       return (
-        <Button variant="outline" className="w-full">
-          <Icons.filter className="w-4 h-4 mr-2" />
-          Compare Products
+        <Button variant="outline" className="w-full" asChild>
+          <Link href={`/compare?products=${currentProduct?.id}`} className="flex items-center">
+            <Icons.filter className="w-4 h-4 mr-2" />
+            Compare Products
+          </Link>
         </Button>
       );
     }
@@ -85,7 +87,7 @@ export default function ComparisonPaywall({ currentProduct, variant = 'button' }
           <Link href="/upgrade">
             <Button size="lg" className="w-full">
               <Icons.unlock className="w-5 h-5 mr-2" />
-              Upgrade to Pro - $4/month
+              Upgrade to Pro - $5.99/month
             </Button>
           </Link>
         </CardContent>
@@ -204,14 +206,22 @@ function ComparisonPreviewModal({ currentProduct, onClose }) {
                 Compare up to 4 products at once to find the safest options.
                 See detailed scores, contaminant levels, and make informed decisions.
               </p>
-              <Link href="/upgrade" onClick={onClose}>
-                <Button size="lg">
-                  <Icons.unlock className="w-5 h-5 mr-2" />
-                  Upgrade to Pro - $4/month
-                </Button>
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href={`/compare?products=${currentProduct?.id}`} onClick={onClose}>
+                  <Button size="lg" variant="outline" className="border-2">
+                    <Icons.filter className="w-5 h-5 mr-2" />
+                    Try Free
+                  </Button>
+                </Link>
+                <Link href="/upgrade" onClick={onClose}>
+                  <Button size="lg">
+                    <Icons.unlock className="w-5 h-5 mr-2" />
+                    Upgrade to Pro - $5.99/month
+                  </Button>
+                </Link>
+              </div>
               <p className="text-sm text-gray-500 mt-3">
-                or $40/year (save $8)
+                Free: Compare 2 products • Pro: Compare up to 4 + PDF export
               </p>
             </div>
           </div>

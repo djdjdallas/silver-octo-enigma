@@ -88,7 +88,7 @@ export default function FavoritesLimit({ variant = 'banner' }) {
             <Link href="/upgrade">
               <Button size="sm" className="bg-red-600 hover:bg-red-700">
                 <Icons.unlock className="w-4 h-4 mr-2" />
-                Upgrade to Pro - $4/month
+                Upgrade to Pro - $5.99/month
               </Button>
             </Link>
           </div>

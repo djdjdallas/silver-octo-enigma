@@ -12,6 +12,7 @@ import ContaminantCard from '@/components/ContaminantCard';
 import UpgradeBanner from '@/components/UpgradeBanner';
 import ComparisonPaywall from '@/components/ComparisonPaywall';
 import Disclaimer from '@/components/Disclaimer';
+import AILabResultsTranslator from '@/components/AILabResultsTranslator';
 import { formatDate, getUserTier } from '@/lib/utils';
 import ProductActions from './ProductActions';
 
@@ -29,13 +30,41 @@ export async function generateMetadata({ params }) {
     };
   }
 
+  // Generate SEO-friendly title and description with keywords
+  const brandLower = product.brand?.toLowerCase() || '';
+  const nameLower = product.name?.toLowerCase() || '';
+
+  // Add brand-specific keywords
+  let brandKeyword = '';
+  if (brandLower.includes('gerber')) brandKeyword = 'Is Gerber Safe?';
+  else if (brandLower.includes('happy')) brandKeyword = 'Happy Baby Safety';
+  else if (brandLower.includes('beech')) brandKeyword = 'Beech-Nut Testing';
+
+  // Add product-specific keywords
+  let productTypeKeyword = '';
+  if (nameLower.includes('rice') || nameLower.includes('cereal')) {
+    productTypeKeyword = 'Baby Food Arsenic';
+  } else if (nameLower.includes('carrot') || nameLower.includes('sweet potato')) {
+    productTypeKeyword = 'Baby Food Lead & Cadmium';
+  } else {
+    productTypeKeyword = 'Baby Food Heavy Metals';
+  }
+
   return {
-    title: `${product.name} - Safety Rating | SafeBaby`,
-    description: `View heavy metal test results and safety ratings for ${product.name} by ${product.brand}. See detailed lab data for arsenic, lead, cadmium, and mercury.`,
+    title: `${product.name} Heavy Metals Test | ${brandKeyword || `${product.brand} Safety`} | SafeBaby`,
+    description: `${product.name} by ${product.brand} heavy metals test results. See lead, arsenic, cadmium & mercury levels. ${brandKeyword} Check ${product.brand} baby food safety score and compare alternatives.`,
+    keywords: [
+      `${product.name} heavy metals`,
+      `${product.brand} baby food safety`,
+      `is ${product.brand} safe`,
+      productTypeKeyword,
+      `${product.brand} ${product.category || 'baby food'} testing`,
+    ],
     openGraph: {
-      title: `${product.name} - Safety Rating`,
-      description: `Heavy metal test results for ${product.name}`,
+      title: `${product.name} - Heavy Metals Safety Rating`,
+      description: `${productTypeKeyword} test results for ${product.name} by ${product.brand}. Independent lab testing data.`,
       images: product.image_url ? [product.image_url] : [],
+      url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.com'}/product/${product.id}`,
     },
   };
 }
@@ -64,9 +93,18 @@ async function getProductData(productId) {
     .eq('product_id', productId)
     .order('test_date', { ascending: false });
 
+  // Check for active recalls
+  const { data: recalls } = await supabase
+    .from('recalls')
+    .select('*')
+    .eq('product_id', productId)
+    .eq('is_active', true)
+    .order('recall_date', { ascending: false });
+
   return {
     product,
     labResults: labResults || [],
+    recalls: recalls || [],
   };
 }
 
@@ -92,7 +130,7 @@ export default async function ProductDetailPage({ params }) {
     notFound();
   }
 
-  const { product, labResults } = data;
+  const { product, labResults, recalls } = data;
   const userProfile = await getUserProfile();
   const userTier = getUserTier(userProfile);
   const isPro = userTier === 'pro';
@@ -101,6 +139,9 @@ export default async function ProductDetailPage({ params }) {
   const hasExceedingContaminants = labResults.some((result) =>
     result.contaminants?.some((c) => c.exceeds_limit)
   );
+
+  // Check if product has active recalls
+  const hasActiveRecalls = recalls && recalls.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -121,6 +162,86 @@ export default async function ProductDetailPage({ params }) {
           <div className="mb-6">
             <Disclaimer variant="full" />
           </div>
+
+          {/* RECALL WARNING BANNER */}
+          {hasActiveRecalls && (
+            <div className="mb-8 bg-gradient-to-br from-red-600 to-red-700 rounded-3xl shadow-2xl border-4 border-red-800 overflow-hidden animate-pulse">
+              <div className="p-8 md:p-10 relative">
+                {/* Warning pattern background */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute inset-0" style={{
+                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px)',
+                  }} />
+                </div>
+
+                <div className="relative z-10">
+                  {/* Icon and heading */}
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center shadow-lg">
+                      <Icons.alert className="w-10 h-10 md:w-12 md:h-12 text-red-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">
+                        ⚠️ PRODUCT RECALLED
+                      </h2>
+                      <p className="text-xl md:text-2xl text-red-100 font-semibold">
+                        This product has {recalls.length} active {recalls.length === 1 ? 'recall' : 'recalls'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Recall details */}
+                  <div className="space-y-4 mb-6">
+                    {recalls.map((recall) => (
+                      <div key={recall.id} className="bg-white bg-opacity-95 rounded-2xl p-6 shadow-lg">
+                        <div className="flex items-start justify-between gap-4 mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge className="bg-red-600 text-white text-sm px-3 py-1">
+                                {recall.risk_level}
+                              </Badge>
+                              <span className="text-sm text-gray-600">
+                                Recalled: {formatDate(recall.recall_date)}
+                              </span>
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">
+                              {recall.reason}
+                            </h3>
+                            <p className="text-gray-700 leading-relaxed">
+                              {recall.description}
+                            </p>
+                          </div>
+                        </div>
+                        {recall.fda_url && (
+                          <div className="pt-3 border-t border-gray-200">
+                            <a
+                              href={recall.fda_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center text-red-600 hover:text-red-700 font-semibold transition-colors"
+                            >
+                              <Icons.external className="w-4 h-4 mr-2" />
+                              View Official FDA Recall Notice
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Action message */}
+                  <div className="bg-white bg-opacity-95 rounded-2xl p-6 shadow-lg">
+                    <p className="text-lg font-bold text-gray-900 mb-2">
+                      ⚠️ DO NOT USE THIS PRODUCT
+                    </p>
+                    <p className="text-gray-700 leading-relaxed">
+                      If you have this product, stop using it immediately and follow the manufacturer's instructions for returns or disposal. Contact your pediatrician if you have concerns about your child's health.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Product Header */}
           <div className="grid md:grid-cols-2 gap-8 mb-8">
@@ -169,6 +290,20 @@ export default async function ProductDetailPage({ params }) {
                 <p className="text-gray-700 mb-6">{product.description}</p>
               )}
 
+              {/* SEO-optimized description */}
+              <div className="text-sm text-gray-600 mb-6 bg-gray-50 rounded-lg p-4">
+                <p>
+                  Wondering <strong>is {product.brand} {product.name} safe</strong> for your baby?
+                  Based on independent <strong>baby food heavy metals</strong> testing, this product contains measurable levels of lead, arsenic, cadmium, or mercury.
+                  {product.overall_score && product.overall_score >= 80 ?
+                    ` With a safety score of ${product.overall_score}/100, this is one of the safer ${product.category || 'baby food'} options available.` :
+                    product.overall_score && product.overall_score < 60 ?
+                    ` Consider checking our database for lower heavy metal alternatives in the ${product.category || 'baby food'} category.` :
+                    ` Review the complete test results below to make an informed decision.`
+                  }
+                </p>
+              </div>
+
               {/* Product Actions (Share, Favorite) */}
               <ProductActions product={product} />
 
@@ -203,6 +338,20 @@ export default async function ProductDetailPage({ params }) {
           {product.overall_score && (
             <div className="mb-8">
               <ScoreDisplay score={product.overall_score} userTier={userTier} />
+              {hasActiveRecalls && (
+                <div className="mt-4 bg-red-50 border-2 border-red-200 rounded-2xl p-6">
+                  <div className="flex items-start gap-3">
+                    <Icons.info className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-red-900">
+                      <p className="font-semibold mb-1">About This Safety Score</p>
+                      <p className="leading-relaxed">
+                        This score reflects heavy metals testing (lead, arsenic, cadmium, mercury) only.
+                        It does NOT include recall status. See the recall warning above for critical safety information.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -216,6 +365,15 @@ export default async function ProductDetailPage({ params }) {
                 All lab results are available to everyone for free. These tests are conducted by independent laboratories.
               </p>
             </div>
+
+            {/* AI-Powered Lab Results Translation */}
+            {labResults.length > 0 && labResults[0].contaminants && (
+              <AILabResultsTranslator
+                product={product}
+                contaminants={labResults.flatMap(lr => lr.contaminants || [])}
+                userTier={userTier}
+              />
+            )}
 
             {labResults.length > 0 ? (
               labResults.map((labResult) => (

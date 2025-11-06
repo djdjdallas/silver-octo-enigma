@@ -149,25 +149,25 @@ export const AB_TESTS = {
   PRICING_DISPLAY: {
     name: 'pricing-display-test',
     variants: {
-      CONTROL: 'control', // "$4/month"
-      VARIANT_A: 'variant-a', // "$0.13/day"
-      VARIANT_B: 'variant-b', // "$4/month or $40/year (save 17%)"
+      CONTROL: 'control', // "$5.99/month"
+      VARIANT_A: 'variant-a', // "$0.20/day"
+      VARIANT_B: 'variant-b', // "$5.99/month or $59.99/year (save 17%)"
     },
     getPricing: (variant) => {
       switch (variant) {
         case 'variant-a':
           return {
-            primary: '$0.13/day',
+            primary: '$0.20/day',
             secondary: 'Less than a cup of coffee',
           };
         case 'variant-b':
           return {
-            primary: '$4/month',
-            secondary: 'or $40/year (save 17%)',
+            primary: '$5.99/month',
+            secondary: 'or $59.99/year (save 17%)',
           };
         default:
           return {
-            primary: '$4/month',
+            primary: '$5.99/month',
             secondary: 'Cancel anytime',
           };
       }

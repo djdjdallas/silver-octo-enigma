@@ -4,7 +4,7 @@ import { createCheckoutSession } from '@/lib/stripe';
 
 export async function POST(request) {
   try {
-    const { priceId, userId, email } = await request.json();
+    const { priceId, userId, email, mode } = await request.json();
 
     if (!priceId || !userId || !email) {
       return NextResponse.json(
@@ -13,7 +13,9 @@ export async function POST(request) {
       );
     }
 
-    const session = await createCheckoutSession(userId, priceId, email);
+    // Default to 'subscription' if mode not provided
+    const checkoutMode = mode || 'subscription';
+    const session = await createCheckoutSession(userId, priceId, email, checkoutMode);
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

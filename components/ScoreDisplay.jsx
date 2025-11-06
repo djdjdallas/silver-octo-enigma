@@ -62,7 +62,7 @@ export default function ScoreDisplay({ score, userTier = 'free' }) {
               <Link href="/upgrade">
                 <Button size="default">
                   <Icons.unlock className="w-4 h-4 mr-2" />
-                  Upgrade to Pro - $4/month
+                  Upgrade to Pro - $5.99/month
                 </Button>
               </Link>
             </div>

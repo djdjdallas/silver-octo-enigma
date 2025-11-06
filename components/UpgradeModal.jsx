@@ -138,13 +138,13 @@ export default function UpgradeModal({ isOpen, onClose, scansCount = 3 }) {
           <Link href="/upgrade" onClick={handleClose}>
             <Button size="lg" className="w-full mb-3">
               <Icons.unlock className="w-5 h-5 mr-2" />
-              Unlock Full Safety Scores - $4/month
+              Unlock Full Safety Scores - $5.99/month
             </Button>
           </Link>
 
           {/* Pricing note */}
           <p className="text-center text-sm text-gray-500">
-            or $40/year (save $8)
+            or $59.99/year (save 17%) • $149.99 lifetime
           </p>
 
           {/* Continue browsing */}

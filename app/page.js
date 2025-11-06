@@ -15,8 +15,32 @@ import {
 } from '@/components/DecorativeElements';
 
 export const metadata = {
-  title: 'SafeBaby - Baby Food Safety Ratings & Heavy Metal Testing',
-  description: 'Scan baby food products and check safety ratings based on independent lab testing for heavy metals like arsenic, lead, cadmium, and mercury.',
+  title: 'SafeBaby - Baby Food Heavy Metals Scanner | Check 500+ Products for Lead & Arsenic',
+  description: 'Scan baby food for heavy metals instantly. Check lead, arsenic, cadmium & mercury levels in Gerber, Beech-Nut, Happy Baby & 500+ products. Free safety ratings.',
+  keywords: [
+    'baby food heavy metals',
+    'baby food scanner',
+    'baby food safety',
+    'baby food arsenic',
+    'baby food lead',
+    'safest baby food brands'
+  ],
+  openGraph: {
+    title: 'SafeBaby - Baby Food Heavy Metals Scanner',
+    description: 'Scan baby food for heavy metals. Get instant safety ratings for 500+ products.',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.com',
+    siteName: 'SafeBaby',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'SafeBaby - Baby Food Heavy Metals Scanner',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
 };
 
 async function getFeaturedProducts() {
