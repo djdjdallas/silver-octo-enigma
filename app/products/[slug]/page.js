@@ -2,7 +2,7 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -42,7 +42,8 @@ export async function generateMetadata({ params }) {
 }
 
 export async function generateStaticParams() {
-  const supabase = await createClient();
+  // Use service client for static generation (doesn't require cookies)
+  const supabase = createServiceClient();
   const { data: products } = await supabase
     .from('products')
     .select('id, name, brand');

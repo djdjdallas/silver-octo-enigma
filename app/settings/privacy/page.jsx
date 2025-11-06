@@ -1,12 +1,8 @@
 // Privacy Settings Page
 // Allow users to manage their privacy preferences
+'use client';
 
 import { CookieConsentStatus } from '@/components/CookieConsent';
-
-export const metadata = {
-  title: 'Privacy Settings - SafeBaby',
-  description: 'Manage your privacy and data preferences',
-};
 
 export default function PrivacySettings() {
   return (

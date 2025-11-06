@@ -1,7 +1,7 @@
 // SEO-optimized brand pages showing all products from a specific brand
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
@@ -36,7 +36,8 @@ export async function generateMetadata({ params }) {
 }
 
 export async function generateStaticParams() {
-  const supabase = await createClient();
+  // Use service client for static generation (doesn't require cookies)
+  const supabase = createServiceClient();
   const { data: products } = await supabase
     .from('products')
     .select('brand');

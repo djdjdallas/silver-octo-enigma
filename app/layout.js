@@ -1,5 +1,6 @@
 // Root layout for the application
 import { Inter } from 'next/font/google';
+import { Suspense } from 'react';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import Navigation from '@/components/Navigation';
@@ -81,8 +82,9 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#10b981" />
       </head>
       <body className={inter.className}>
-        <AnalyticsProvider>
-          <SubscriptionProvider>
+        <Suspense fallback={null}>
+          <AnalyticsProvider>
+            <SubscriptionProvider>
             <div className="flex flex-col min-h-screen">
               <Navigation />
               <main className="flex-1">
@@ -142,8 +144,9 @@ export default function RootLayout({ children }) {
         <FirstUseAgreement />
         <ScanTracker />
         <CookieConsent />
-          </SubscriptionProvider>
-        </AnalyticsProvider>
+            </SubscriptionProvider>
+          </AnalyticsProvider>
+        </Suspense>
       </body>
     </html>
   );
