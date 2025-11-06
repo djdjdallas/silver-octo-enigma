@@ -28,6 +28,7 @@ export default function ComparePage() {
   const [userProfile, setUserProfile] = useState(null);
   const [savingComparison, setSavingComparison] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const supabase = createClient();
 
   // Check authentication and load user profile
@@ -54,6 +55,25 @@ export default function ComparePage() {
 
     checkAuthAndLoadProfile();
   }, [router]);
+
+  // Show preview modal for non-premium users on page load
+  useEffect(() => {
+    if (authChecking) return; // Wait for auth check to complete
+
+    const userTier = getUserTier(userProfile);
+    const hasSeenModal = sessionStorage.getItem('compare-preview-shown');
+
+    // Show modal if user is not Pro and hasn't seen it this session
+    if (userTier !== 'pro' && !hasSeenModal) {
+      // Small delay to let the page load
+      const timer = setTimeout(() => {
+        setShowPreviewModal(true);
+        sessionStorage.setItem('compare-preview-shown', 'true');
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [authChecking, userProfile]);
 
   // Load products from URL query params
   useEffect(() => {
@@ -449,6 +469,124 @@ export default function ComparePage() {
           </Card>
         )}
       </div>
+
+      {/* Comparison Preview Modal for Non-Premium Users */}
+      {showPreviewModal && (
+        <ComparisonPreviewModal onClose={() => setShowPreviewModal(false)} />
+      )}
+    </div>
+  );
+}
+
+// Comparison Preview Modal Component
+function ComparisonPreviewModal({ onClose }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <Card className="relative max-w-2xl w-full">
+        <CardContent className="p-8">
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
+            aria-label="Close modal"
+          >
+            <Icons.close className="w-5 h-5" />
+          </button>
+
+          {/* Icon */}
+          <div className="flex justify-center mb-6">
+            <div className="bg-primary-100 rounded-full p-4">
+              <Icons.filter className="w-12 h-12 text-primary-600" />
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              Product Comparison Preview
+            </h2>
+            <p className="text-gray-600 mb-6">
+              See how you can compare up to 4 products side-by-side with Pro
+            </p>
+
+            <div className="bg-gradient-to-br from-primary-50 to-white border-2 border-primary-200 rounded-2xl p-6 mb-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                Unlock Side-by-Side Comparison
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Compare up to 4 products at once to find the safest options. See detailed scores, contaminant levels, and make informed decisions.
+              </p>
+            </div>
+          </div>
+
+          {/* Features */}
+          <div className="space-y-3 mb-6">
+            <div className="flex items-start space-x-3">
+              <div className="bg-green-100 rounded-full p-1 mt-0.5">
+                <Icons.checkmark className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">Side-by-side safety score comparison</p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <div className="bg-green-100 rounded-full p-1 mt-0.5">
+                <Icons.checkmark className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">Detailed contaminant level breakdown</p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <div className="bg-green-100 rounded-full p-1 mt-0.5">
+                <Icons.checkmark className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">Compare up to 4 products at once</p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3">
+              <div className="bg-green-100 rounded-full p-1 mt-0.5">
+                <Icons.checkmark className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">Export results as PDF</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col gap-3">
+            <Link href="/upgrade" onClick={onClose}>
+              <Button size="lg" className="w-full">
+                <Icons.unlock className="w-5 h-5 mr-2" />
+                Start 7-Day Free Trial
+              </Button>
+            </Link>
+            <p className="text-center text-sm text-gray-600">
+              Then $5.99/month • Cancel anytime
+            </p>
+          </div>
+
+          {/* Continue browsing */}
+          <button
+            onClick={onClose}
+            className="text-sm text-gray-500 hover:text-gray-700 mt-4 w-full text-center"
+          >
+            Continue with basic comparison
+          </button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
