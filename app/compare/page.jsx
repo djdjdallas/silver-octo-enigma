@@ -27,26 +27,33 @@ export default function ComparePage() {
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [savingComparison, setSavingComparison] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
   const supabase = createClient();
 
-  // Load user profile
+  // Check authentication and load user profile
   useEffect(() => {
-    async function loadUserProfile() {
+    async function checkAuthAndLoadProfile() {
       const { data: { user } } = await supabase.auth.getUser();
 
-      if (user) {
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        setUserProfile(profile);
+      if (!user) {
+        // Redirect to login with return URL
+        const currentPath = window.location.pathname + window.location.search;
+        router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+        return;
       }
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      setUserProfile(profile);
+      setAuthChecking(false);
     }
 
-    loadUserProfile();
-  }, []);
+    checkAuthAndLoadProfile();
+  }, [router]);
 
   // Load products from URL query params
   useEffect(() => {
