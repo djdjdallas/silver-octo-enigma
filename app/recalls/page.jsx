@@ -8,6 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { formatDate } from '@/lib/utils';
+import {
+  CircleDecoration,
+  FruitIllustration,
+} from '@/components/DecorativeElements';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -100,38 +104,56 @@ export default function RecallsPage() {
   const affectedCount = recalls.filter(recall => userFavorites.has(recall.product_id)).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-coral-50 relative overflow-hidden">
+      {/* Decorative Elements */}
+      <div className="absolute top-10 left-10 opacity-20 z-0">
+        <FruitIllustration type="carrot" className="w-16 h-16 md:w-24 md:h-24" />
+      </div>
+      <div className="absolute bottom-20 right-10 opacity-20 z-0">
+        <FruitIllustration type="pear" className="w-12 h-12 md:w-20 md:h-20" />
+      </div>
+      <CircleDecoration className="absolute top-60 right-20 w-32 h-32 opacity-10 z-0" color="coral" />
+      <CircleDecoration className="absolute bottom-40 left-20 w-24 h-24 opacity-10 z-0" color="lavender" />
+
+      <div className="container mx-auto px-4 max-w-6xl py-8 relative z-10">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-            Product Recalls
-          </h1>
-          <p className="text-gray-600">
-            Active FDA recalls for baby food products
-          </p>
+        <div className="mb-8 bg-white rounded-3xl shadow-lg p-8 md:p-10 border-2 border-red-100 relative overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-red-200 to-coral-200 rounded-full opacity-30 blur-2xl" />
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-br from-yellow-200 to-orange-200 rounded-full opacity-30 blur-2xl" />
+
+          <div className="relative z-10">
+            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">
+              Product Recalls ⚠️
+            </h1>
+            <p className="text-lg text-gray-600">
+              Active FDA recalls for baby food products
+            </p>
+          </div>
         </div>
 
         {/* Alert Info */}
-        <Card className="mb-6 border-blue-200 bg-blue-50">
-          <CardContent className="p-6">
-            <div className="flex items-start space-x-3">
-              <Icons.info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+        <Card className="mb-6 rounded-3xl border-0 shadow-xl bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-300 rounded-full opacity-20 -mr-16 -mt-16" />
+          <CardContent className="p-8 relative z-10">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                <Icons.info className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">About Recall Classifications</h3>
-                <div className="space-y-2 text-sm">
-                  <p>
-                    <strong className="text-red-600">Class I:</strong>{' '}
-                    {getRiskLevelDescription('Class I')}
-                  </p>
-                  <p>
-                    <strong className="text-orange-600">Class II:</strong>{' '}
-                    {getRiskLevelDescription('Class II')}
-                  </p>
-                  <p>
-                    <strong className="text-yellow-600">Class III:</strong>{' '}
-                    {getRiskLevelDescription('Class III')}
-                  </p>
+                <h3 className="font-bold text-gray-900 mb-4 text-xl">About Recall Classifications</h3>
+                <div className="space-y-3">
+                  <div className="p-4 bg-white rounded-2xl shadow-sm">
+                    <strong className="text-red-600 text-base">Class I:</strong>{' '}
+                    <span className="text-gray-700">{getRiskLevelDescription('Class I')}</span>
+                  </div>
+                  <div className="p-4 bg-white rounded-2xl shadow-sm">
+                    <strong className="text-orange-600 text-base">Class II:</strong>{' '}
+                    <span className="text-gray-700">{getRiskLevelDescription('Class II')}</span>
+                  </div>
+                  <div className="p-4 bg-white rounded-2xl shadow-sm">
+                    <strong className="text-yellow-600 text-base">Class III:</strong>{' '}
+                    <span className="text-gray-700">{getRiskLevelDescription('Class III')}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -140,25 +162,26 @@ export default function RecallsPage() {
 
         {/* Filters */}
         {userFavorites.size > 0 && (
-          <Card className="mb-6">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm font-medium text-gray-700">Filter:</span>
+          <Card className="mb-6 rounded-3xl border-0 shadow-xl bg-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-4">
+                  <span className="font-semibold text-gray-700">Filter:</span>
                   <Button
                     variant={filterAffected ? 'default' : 'outline'}
-                    size="sm"
+                    size="default"
                     onClick={() => setFilterAffected(!filterAffected)}
+                    className={filterAffected ? 'bg-red-500 hover:bg-red-600 rounded-full' : 'rounded-full border-2'}
                   >
                     <Icons.alert className="w-4 h-4 mr-2" />
                     My Favorites Only
                     {affectedCount > 0 && (
-                      <Badge className="ml-2 bg-red-500">{affectedCount}</Badge>
+                      <Badge className="ml-2 bg-red-600">{affectedCount}</Badge>
                     )}
                   </Button>
                 </div>
 
-                <div className="text-sm text-gray-600">
+                <div className="text-base font-medium text-gray-600">
                   {filteredRecalls.length} {filteredRecalls.length === 1 ? 'recall' : 'recalls'}
                 </div>
               </div>
@@ -168,21 +191,21 @@ export default function RecallsPage() {
 
         {/* Recalls List */}
         {loading ? (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <Icons.spinner className="w-12 h-12 text-gray-300 mx-auto mb-4 animate-spin" />
-              <p className="text-gray-600">Loading recalls...</p>
+          <Card className="rounded-3xl border-0 shadow-xl bg-white">
+            <CardContent className="p-16 text-center">
+              <Icons.spinner className="w-16 h-16 text-primary-500 mx-auto mb-4 animate-spin" />
+              <p className="text-lg text-gray-600">Loading recalls...</p>
             </CardContent>
           </Card>
         ) : filteredRecalls.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {filteredRecalls.map((recall) => {
               const isAffected = userFavorites.has(recall.product_id);
 
               return (
                 <Card
                   key={recall.id}
-                  className={isAffected ? 'border-2 border-red-500' : ''}
+                  className={`rounded-3xl border-0 shadow-xl transition-all hover:scale-102 ${isAffected ? 'border-2 border-red-500 bg-red-50' : 'bg-white'}`}
                 >
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row gap-6">
@@ -293,19 +316,24 @@ export default function RecallsPage() {
             })}
           </div>
         ) : (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <Icons.checkmark className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <Card className="rounded-3xl border-0 shadow-xl bg-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-green-100 to-primary-100 rounded-full opacity-30 -mr-20 -mt-20" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-lavender-100 to-butter-100 rounded-full opacity-30 -ml-16 -mb-16" />
+
+            <CardContent className="p-12 md:p-16 text-center relative z-10">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Icons.checkmark className="w-12 h-12 text-green-600" />
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
                 {filterAffected ? 'No Recalls for Your Favorites' : 'No Active Recalls'}
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
                 {filterAffected
                   ? 'Good news! None of your favorited products have active recalls.'
                   : 'There are currently no active recalls for baby food products.'}
               </p>
               {filterAffected && (
-                <Button onClick={() => setFilterAffected(false)} variant="outline">
+                <Button onClick={() => setFilterAffected(false)} className="bg-primary hover:bg-primary-600 rounded-full px-8">
                   View All Recalls
                 </Button>
               )}
@@ -314,24 +342,27 @@ export default function RecallsPage() {
         )}
 
         {/* Stay Informed */}
-        <Card className="mt-8">
-          <CardContent className="p-6">
-            <div className="flex items-start space-x-3">
-              <Icons.bell className="w-6 h-6 text-primary-600 flex-shrink-0 mt-1" />
+        <Card className="mt-8 rounded-3xl border-0 shadow-xl bg-gradient-to-br from-lavender-50 to-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-lavender-300 rounded-full opacity-20 -mr-16 -mt-16" />
+          <CardContent className="p-8 relative z-10">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0">
+                <Icons.bell className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Stay Informed About Recalls</h3>
-                <p className="text-gray-700 mb-4">
+                <h3 className="font-bold text-gray-900 mb-3 text-xl">Stay Informed About Recalls</h3>
+                <p className="text-gray-700 mb-6 leading-relaxed">
                   Get instant notifications when products you've favorited are recalled.
                   Free tier users receive email alerts, while Pro members get instant push notifications and SMS.
                 </p>
-                <div className="flex space-x-3">
-                  <Button asChild size="sm">
-                    <Link href="/dashboard">
+                <div className="flex gap-3 flex-wrap">
+                  <Button asChild className="bg-primary hover:bg-primary-600 rounded-full">
+                    <Link href="/dashboard" className="flex items-center">
                       Manage Notification Settings
                     </Link>
                   </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <Link href="/upgrade">
+                  <Button asChild variant="outline" className="rounded-full border-2">
+                    <Link href="/upgrade" className="flex items-center">
                       <Icons.award className="w-4 h-4 mr-2" />
                       Upgrade to Pro
                     </Link>

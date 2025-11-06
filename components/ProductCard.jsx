@@ -15,8 +15,8 @@ export default function ProductCard({ product, userTier = 'free', showScore = tr
 
   return (
     <Link href={`/product/${product.id}`}>
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200 h-full">
-        <div className="aspect-square relative bg-gray-100">
+      <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 h-full group hover:scale-105 rounded-3xl border-0">
+        <div className="aspect-square relative bg-gradient-to-br from-primary-50 to-coral-50">
           {product.image_url ? (
             <Image
               src={product.image_url}
@@ -31,79 +31,100 @@ export default function ProductCard({ product, userTier = 'free', showScore = tr
             </div>
           )}
 
-          {/* Score Badge */}
+          {/* Score Badge - Circular */}
           {showScore && hasScore && (
-            <div className="absolute top-2 right-2">
+            <div className="absolute top-2 right-2 z-10">
               {isPro ? (
-                // Pro users see numeric score
-                <Badge
+                // Pro users see numeric score in circle
+                <div
                   className={cn(
-                    'text-sm font-bold px-3 py-1',
-                    getScoreColor(product.overall_score)
+                    'w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg',
+                    product.overall_score >= 70 ? 'bg-primary' :
+                    product.overall_score >= 40 ? 'bg-butter-400' :
+                    'bg-coral'
                   )}
                 >
                   {product.overall_score}
-                </Badge>
+                </div>
               ) : (
-                // Free users see Safe/Caution/Avoid badge
-                <Badge
+                // Free users see Safe/Caution/Avoid badge in rounded pill
+                <div
                   className={cn(
-                    'text-white text-sm font-bold px-3 py-1',
-                    safetyIndicator.color
+                    'px-4 py-2 rounded-full text-white text-xs font-bold shadow-lg',
+                    safetyIndicator.label === 'Safe' ? 'bg-primary' :
+                    safetyIndicator.label === 'Caution' ? 'bg-butter-400' :
+                    'bg-coral'
                   )}
                 >
                   {safetyIndicator.label}
-                </Badge>
+                </div>
               )}
             </div>
           )}
 
           {/* Category Badge */}
           {product.category && (
-            <div className="absolute top-2 left-2">
-              <Badge variant="secondary" className="capitalize">
+            <div className="absolute bottom-3 left-3">
+              <Badge className="capitalize bg-white/90 text-gray-700 hover:bg-white rounded-full px-3">
                 {product.category}
               </Badge>
             </div>
           )}
         </div>
 
-        <CardContent className="p-4">
-          <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1">
+        <CardContent className="p-5">
+          <h3 className="font-bold text-gray-900 line-clamp-2 mb-2 text-lg">
             {product.name}
           </h3>
 
           {product.brand && (
-            <p className="text-sm text-gray-600 mb-2">{product.brand}</p>
+            <p className="text-sm text-gray-600 font-medium mb-3">{product.brand}</p>
           )}
 
           {/* Score Info */}
           {showScore && hasScore && (
-            <div className="flex items-center justify-between mt-3 pt-3 border-t">
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
               {isPro ? (
                 <>
-                  <span className="text-xs text-gray-600">Safety Score</span>
-                  <span className={cn('text-xs font-semibold', getScoreColor(product.overall_score))}>
-                    {product.overall_score}/100 - {getScoreBadge(product.overall_score)}
+                  <span className="text-xs text-gray-500 font-medium">Safety Score</span>
+                  <span className={cn('text-sm font-bold',
+                    product.overall_score >= 70 ? 'text-primary' :
+                    product.overall_score >= 40 ? 'text-butter-600' :
+                    'text-coral'
+                  )}>
+                    {product.overall_score}/100
                   </span>
                 </>
               ) : (
                 <>
-                  <span className="text-xs text-gray-600">Safety Rating</span>
-                  <span className={cn('text-xs font-semibold', safetyIndicator.textColor)}>
-                    {safetyIndicator.label}
-                  </span>
+                  <span className="text-xs text-gray-500 font-medium">Safety Rating</span>
+                  <div className="flex items-center gap-1">
+                    <div className={cn(
+                      'w-2 h-2 rounded-full',
+                      safetyIndicator.label === 'Safe' ? 'bg-primary' :
+                      safetyIndicator.label === 'Caution' ? 'bg-butter-400' :
+                      'bg-coral'
+                    )} />
+                    <span className={cn('text-sm font-bold',
+                      safetyIndicator.label === 'Safe' ? 'text-primary' :
+                      safetyIndicator.label === 'Caution' ? 'text-butter-600' :
+                      'text-coral'
+                    )}>
+                      {safetyIndicator.label}
+                    </span>
+                  </div>
                 </>
               )}
             </div>
           )}
 
-          {/* Quick Info */}
-          {product.description && (
-            <p className="text-xs text-gray-500 mt-2 line-clamp-2">
-              {product.description}
-            </p>
-          )}
+          {/* View Details Button */}
+          <div className="mt-4">
+            <div className="flex items-center text-coral font-semibold text-sm group-hover:gap-2 transition-all">
+              View Details
+              <Icons.arrowRight className="w-4 h-4 ml-1 group-hover:ml-2 transition-all" />
+            </div>
+          </div>
         </CardContent>
       </Card>
     </Link>

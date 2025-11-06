@@ -24,13 +24,13 @@ export default function ScoreDisplay({ score, userTier = 'free' }) {
         </CardHeader>
         <CardContent>
           {/* Safety Indicator Badge - FREE for all users */}
-          <div className={cn('rounded-lg p-6 text-center mb-6', safetyIndicator.bgLight)}>
-            <div className="flex items-center justify-center mb-3">
-              <Badge className={cn('text-white text-lg px-4 py-2', safetyIndicator.color)}>
+          <div className={cn('rounded-lg p-8 text-center mb-6', safetyIndicator.bgLight)}>
+            <div className="flex items-center justify-center mb-4">
+              <Badge className={cn('text-white text-lg px-6 py-2', safetyIndicator.color)}>
                 {safetyIndicator.label}
               </Badge>
             </div>
-            <p className={cn('text-sm font-medium', safetyIndicator.textColor)}>
+            <p className={cn('text-base font-medium leading-relaxed max-w-2xl mx-auto', safetyIndicator.textColor)}>
               {score >= 70 && 'This product meets safety standards with low contaminant levels.'}
               {score >= 50 && score < 70 && 'This product has moderate contaminant levels. Consider alternatives.'}
               {score < 50 && 'This product has high contaminant levels. We recommend choosing alternatives.'}
@@ -38,7 +38,7 @@ export default function ScoreDisplay({ score, userTier = 'free' }) {
           </div>
 
           {/* Blurred detailed score - Pro feature */}
-          <div className="bg-gray-100 rounded-lg p-6 text-center relative overflow-hidden">
+          <div className="bg-gray-100 rounded-lg p-12 text-center relative overflow-hidden min-h-[280px]">
             <div className="blur-md select-none pointer-events-none">
               <div className="text-5xl font-bold text-gray-400 mb-2">
                 {score}
@@ -49,18 +49,18 @@ export default function ScoreDisplay({ score, userTier = 'free' }) {
             </div>
 
             {/* Overlay with lock */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm">
-              <div className="bg-primary-500 rounded-full p-3 mb-3">
-                <Icons.lock className="w-6 h-6 text-white" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm p-6">
+              <div className="bg-primary-500 rounded-full p-4 mb-4">
+                <Icons.lock className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Unlock Detailed Score
               </h3>
-              <p className="text-gray-600 mb-3 max-w-xs mx-auto text-xs">
+              <p className="text-gray-600 mb-4 max-w-sm mx-auto text-sm leading-relaxed">
                 See 0-100 score breakdown and compare products
               </p>
               <Link href="/upgrade">
-                <Button size="sm">
+                <Button size="default">
                   <Icons.unlock className="w-4 h-4 mr-2" />
                   Upgrade to Pro - $4/month
                 </Button>
@@ -68,16 +68,16 @@ export default function ScoreDisplay({ score, userTier = 'free' }) {
             </div>
           </div>
 
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-            <div className="flex items-start space-x-2">
+          <div className="mt-6 p-5 bg-blue-50 rounded-lg">
+            <div className="flex items-start space-x-3">
               <Icons.info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-blue-900">
-                <p className="font-medium mb-1">All contaminant data is free!</p>
-                <p className="text-blue-700 mb-2">
+                <p className="font-medium mb-2">All contaminant data is free!</p>
+                <p className="text-blue-700 mb-3 leading-relaxed">
                   View detailed lab results below. Pro unlocks detailed 0-100 scores,
                   side-by-side comparisons, and personalized recommendations.
                 </p>
-                <p className="text-xs text-blue-600 border-t border-blue-200 pt-2 mt-2">
+                <p className="text-xs text-blue-600 border-t border-blue-200 pt-3 mt-3 leading-relaxed">
                   <strong>Data Sources:</strong> Independent laboratory testing, Healthy Babies Bright Futures Study (2019),
                   CA AB 899 Manufacturer Disclosures, Consumer Reports (2023), FDA testing data, and manufacturer disclosures.
                   Test results may not reflect current formulations.

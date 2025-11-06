@@ -11,6 +11,10 @@ import ProductSelector from '@/components/ProductSelector';
 import ComparisonTable from '@/components/ComparisonTable';
 import { validateComparisonLimit, generateComparisonShareLink, parseComparisonQuery, getComparisonSummary } from '@/lib/comparison';
 import { getUserTier } from '@/lib/utils';
+import {
+  CircleDecoration,
+  FruitIllustration,
+} from '@/components/DecorativeElements';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -236,57 +240,69 @@ export default function ComparePage() {
   const summary = canCompare ? getComparisonSummary(selectedProducts) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-7xl">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-coral-50 relative overflow-hidden">
+      {/* Decorative Elements */}
+      <div className="absolute top-10 right-10 opacity-20 z-0">
+        <FruitIllustration type="apple" className="w-16 h-16 md:w-24 md:h-24" />
+      </div>
+      <div className="absolute bottom-20 left-10 opacity-20 z-0">
+        <FruitIllustration type="orange" className="w-12 h-12 md:w-20 md:h-20" />
+      </div>
+      <CircleDecoration className="absolute top-40 left-20 w-32 h-32 opacity-10 z-0" color="lavender" />
+      <CircleDecoration className="absolute bottom-60 right-10 w-24 h-24 opacity-10 z-0" color="butter" />
+
+      <div className="container mx-auto px-4 max-w-7xl py-8 relative z-10">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                Compare Products
-              </h1>
-              <p className="text-gray-600">
-                Compare up to 4 baby food products side-by-side
-              </p>
-            </div>
+        <div className="mb-8 bg-white rounded-3xl shadow-lg p-8 md:p-10 border-2 border-primary-100 relative overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-coral-200 to-primary-200 rounded-full opacity-30 blur-2xl" />
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-br from-butter-200 to-lavender-200 rounded-full opacity-30 blur-2xl" />
 
-            {canCompare && (
-              <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" onClick={handleShareComparison}>
-                  <Icons.share className="w-4 h-4 mr-2" />
-                  Share
-                </Button>
-
-                <Button variant="outline" size="sm" onClick={handleSaveComparison} disabled={savingComparison}>
-                  {savingComparison ? (
-                    <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Icons.heart className="w-4 h-4 mr-2" />
-                  )}
-                  Save
-                </Button>
-
-                <Button variant="outline" size="sm" onClick={handleExportPDF}>
-                  <Icons.download className="w-4 h-4 mr-2" />
-                  Export PDF
-                  {userTier !== 'pro' && (
-                    <Badge className="ml-2 bg-primary-500">Pro</Badge>
-                  )}
-                </Button>
-
-                <Button variant="outline" size="sm" onClick={handleClearAll}>
-                  <Icons.close className="w-4 h-4 mr-2" />
-                  Clear
-                </Button>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+              <div>
+                <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">
+                  Compare Products 🔬
+                </h1>
+                <p className="text-lg text-gray-600">
+                  Compare up to 4 baby food products side-by-side
+                </p>
               </div>
-            )}
+
+              {canCompare && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Button variant="outline" size="default" onClick={handleShareComparison} className="rounded-full border-2">
+                    <Icons.share className="w-4 h-4 mr-2" />
+                    Share
+                  </Button>
+
+                  <Button variant="outline" size="default" onClick={handleSaveComparison} disabled={savingComparison} className="rounded-full border-2">
+                    {savingComparison ? (
+                      <Icons.spinner className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Icons.heart className="w-4 h-4 mr-2" />
+                    )}
+                    Save
+                  </Button>
+
+                  <Button variant="outline" size="default" onClick={handleExportPDF} className="rounded-full border-2">
+                    <Icons.download className="w-4 h-4 mr-2" />
+                    Export PDF
+                  </Button>
+
+                  <Button variant="outline" size="default" onClick={handleClearAll} className="rounded-full border-2 text-red-600 hover:bg-red-500 hover:text-white">
+                    <Icons.close className="w-4 h-4 mr-2" />
+                    Clear
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Product Selection */}
-        <Card className="mb-8">
+        <Card className="mb-8 rounded-3xl border-0 shadow-xl bg-white">
           <CardHeader>
-            <CardTitle>Select Products to Compare</CardTitle>
+            <CardTitle className="text-2xl">Select Products to Compare</CardTitle>
           </CardHeader>
           <CardContent>
             <ProductSelector
@@ -300,28 +316,31 @@ export default function ComparePage() {
 
         {/* Comparison Summary */}
         {canCompare && summary && userTier === 'pro' && (
-          <Card className="mb-8 border-primary-500 bg-primary-50">
-            <CardContent className="p-6">
-              <div className="flex items-start space-x-3">
-                <Icons.info className="w-6 h-6 text-primary-600 flex-shrink-0 mt-1" />
+          <Card className="mb-8 rounded-3xl border-2 border-primary-500 bg-gradient-to-br from-primary-50 to-primary-100 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary-400 rounded-full opacity-20 -mr-16 -mt-16" />
+            <CardContent className="p-8 relative z-10">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0">
+                  <Icons.info className="w-6 h-6 text-white" />
+                </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-2">Comparison Summary</h3>
+                  <h3 className="font-bold text-gray-900 mb-4 text-xl">Comparison Summary</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-600">Average Score</p>
-                      <p className="text-2xl font-bold text-gray-900">{summary.averageScore}</p>
+                    <div className="bg-white rounded-2xl p-4 shadow-sm">
+                      <p className="text-sm text-gray-600 mb-1">Average Score</p>
+                      <p className="text-3xl font-bold text-gray-900">{summary.averageScore}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Highest Score</p>
-                      <p className="text-2xl font-bold text-green-600">{summary.highestScore}</p>
+                    <div className="bg-white rounded-2xl p-4 shadow-sm">
+                      <p className="text-sm text-gray-600 mb-1">Highest Score</p>
+                      <p className="text-3xl font-bold text-green-600">{summary.highestScore}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Lowest Score</p>
-                      <p className="text-2xl font-bold text-red-600">{summary.lowestScore}</p>
+                    <div className="bg-white rounded-2xl p-4 shadow-sm">
+                      <p className="text-sm text-gray-600 mb-1">Lowest Score</p>
+                      <p className="text-3xl font-bold text-red-600">{summary.lowestScore}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Score Range</p>
-                      <p className="text-2xl font-bold text-gray-900">{summary.scoreRange}</p>
+                    <div className="bg-white rounded-2xl p-4 shadow-sm">
+                      <p className="text-sm text-gray-600 mb-1">Score Range</p>
+                      <p className="text-3xl font-bold text-gray-900">{summary.scoreRange}</p>
                     </div>
                   </div>
                 </div>
@@ -332,10 +351,10 @@ export default function ComparePage() {
 
         {/* Comparison Table */}
         {loading ? (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <Icons.spinner className="w-12 h-12 text-gray-300 mx-auto mb-4 animate-spin" />
-              <p className="text-gray-600">Loading products...</p>
+          <Card className="rounded-3xl border-0 shadow-xl bg-white">
+            <CardContent className="p-16 text-center">
+              <Icons.spinner className="w-16 h-16 text-primary-500 mx-auto mb-4 animate-spin" />
+              <p className="text-lg text-gray-600">Loading products...</p>
             </CardContent>
           </Card>
         ) : canCompare ? (
@@ -345,25 +364,30 @@ export default function ComparePage() {
             userTier={userTier}
           />
         ) : (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <Icons.filter className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <Card className="rounded-3xl border-0 shadow-xl bg-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-coral-100 to-primary-100 rounded-full opacity-30 -mr-20 -mt-20" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-lavender-100 to-butter-100 rounded-full opacity-30 -ml-16 -mb-16" />
+
+            <CardContent className="p-12 md:p-16 text-center relative z-10">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-100 to-coral-100 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Icons.filter className="w-12 h-12 text-primary-600" />
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
                 Start Comparing Products
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
                 Add at least 2 products to see a side-by-side comparison
               </p>
-              <div className="flex justify-center space-x-4">
-                <Button asChild variant="outline">
-                  <Link href="/search">
-                    <Icons.search className="w-4 h-4 mr-2" />
+              <div className="flex justify-center gap-4 flex-wrap">
+                <Button asChild className="bg-coral hover:bg-coral-600 text-white rounded-full px-8 shadow-lg">
+                  <Link href="/search" className="flex items-center">
+                    <Icons.search className="w-5 h-5 mr-2" />
                     Browse Products
                   </Link>
                 </Button>
-                <Button asChild variant="outline">
-                  <Link href="/scan">
-                    <Icons.scan className="w-4 h-4 mr-2" />
+                <Button asChild variant="outline" className="rounded-full px-8 border-2">
+                  <Link href="/scan" className="flex items-center">
+                    <Icons.scan className="w-5 h-5 mr-2" />
                     Scan Barcode
                   </Link>
                 </Button>
@@ -374,17 +398,19 @@ export default function ComparePage() {
 
         {/* Feature Info */}
         {!userProfile && (
-          <Card className="mt-8">
-            <CardContent className="p-6">
-              <div className="flex items-start space-x-3">
-                <Icons.info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+          <Card className="mt-8 rounded-3xl border-0 shadow-xl bg-gradient-to-br from-blue-50 to-white">
+            <CardContent className="p-8">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                  <Icons.info className="w-6 h-6 text-white" />
+                </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Save and Share Comparisons</h3>
-                  <p className="text-gray-700 mb-3">
+                  <h3 className="font-bold text-gray-900 mb-2 text-xl">Save and Share Comparisons</h3>
+                  <p className="text-gray-700 mb-4 leading-relaxed">
                     Sign in to save your comparisons and access them later from any device.
                   </p>
-                  <Button asChild size="sm">
-                    <Link href="/login">Sign In</Link>
+                  <Button asChild className="bg-primary hover:bg-primary-600 rounded-full">
+                    <Link href="/login" className="flex items-center">Sign In</Link>
                   </Button>
                 </div>
               </div>

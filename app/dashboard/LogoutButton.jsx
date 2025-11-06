@@ -25,11 +25,11 @@ export default function LogoutButton() {
   return (
     <Button
       variant="outline"
-      size="sm"
-      className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+      size="default"
+      className="w-full justify-start text-red-600 hover:text-white hover:bg-red-500 border-2 hover:border-red-500 rounded-full py-6"
       onClick={handleLogout}
     >
-      <Icons.logout className="w-4 h-4 mr-2" />
+      <Icons.logout className="w-5 h-5 mr-3" />
       Logout
     </Button>
   );
