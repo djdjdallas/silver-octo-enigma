@@ -247,6 +247,18 @@ export default function ComparePage() {
   const canCompare = selectedProducts.length >= 2;
   const summary = canCompare ? getComparisonSummary(selectedProducts) : null;
 
+  // Show loading screen while checking authentication
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-coral-50 flex items-center justify-center">
+        <div className="text-center">
+          <Icons.spinner className="w-16 h-16 text-primary-500 mx-auto mb-4 animate-spin" />
+          <p className="text-lg text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-coral-50 relative overflow-hidden">
       {/* Decorative Elements */}

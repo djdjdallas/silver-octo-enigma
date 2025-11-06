@@ -45,19 +45,21 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+    <nav className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex items-center justify-center w-10 h-10 bg-primary-500 rounded-lg">
-              <Icons.shield className="w-6 h-6 text-white" />
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary to-primary-600 rounded-2xl shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+              <Icons.shield className="w-7 h-7 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">SafeBaby</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-600 bg-clip-text text-transparent">
+              SafeBaby
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center space-x-2">
             {navLinks.map((link) => {
               const IconComponent = link.icon;
               return (
@@ -65,10 +67,10 @@ export default function Navigation() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    'flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                    'flex items-center space-x-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300',
                     isActive(link.href)
-                      ? 'bg-primary-50 text-primary-600'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-gradient-to-r from-primary to-primary-600 text-white shadow-md'
+                      : 'text-gray-700 hover:bg-primary-50 hover:text-primary-600'
                   )}
                 >
                   <IconComponent className="w-4 h-4" />
@@ -79,30 +81,46 @@ export default function Navigation() {
           </div>
 
           {/* User Menu */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             {user ? (
               <>
-                <Link href="/dashboard">
-                  <Button variant="ghost" size="icon">
-                    <Icons.user className="w-5 h-5" />
+                <Link href="/dashboard" className="hidden sm:block">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-full hover:bg-primary-50 hover:text-primary-600"
+                  >
+                    <Icons.user className="w-4 h-4 mr-2" />
+                    Dashboard
                   </Button>
                 </Link>
                 <Link href="/upgrade" className="hidden sm:block">
-                  <Button size="sm" variant="default">
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-coral to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white rounded-full px-6 shadow-md hover:shadow-lg transition-all duration-300"
+                  >
+                    <Icons.award className="w-4 h-4 mr-2" />
                     Upgrade to Pro
                   </Button>
                 </Link>
               </>
             ) : (
               <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">
+                <Link href="/login" className="hidden sm:block">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-full hover:bg-primary-50 hover:text-primary-600 font-semibold"
+                  >
                     Login
                   </Button>
                 </Link>
                 <Link href="/signup" className="hidden sm:block">
-                  <Button size="sm">
-                    Sign Up
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-primary to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-full px-6 shadow-md hover:shadow-lg transition-all duration-300 font-semibold"
+                  >
+                    Sign Up Free
                   </Button>
                 </Link>
               </>
@@ -112,13 +130,13 @@ export default function Navigation() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="md:hidden rounded-full hover:bg-primary-50"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
-                <Icons.close className="w-6 h-6" />
+                <Icons.close className="w-6 h-6 text-gray-700" />
               ) : (
-                <Icons.menu className="w-6 h-6" />
+                <Icons.menu className="w-6 h-6 text-gray-700" />
               )}
             </Button>
           </div>
@@ -126,8 +144,8 @@ export default function Navigation() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t py-4">
-            <div className="flex flex-col space-y-2">
+          <div className="md:hidden border-t border-gray-100 py-6 bg-gradient-to-b from-white to-primary-50/30">
+            <div className="flex flex-col space-y-2 px-2">
               {navLinks.map((link) => {
                 const IconComponent = link.icon;
                 return (
@@ -136,10 +154,10 @@ export default function Navigation() {
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
                     className={cn(
-                      'flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium transition-colors',
+                      'flex items-center space-x-3 px-5 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300',
                       isActive(link.href)
-                        ? 'bg-primary-50 text-primary-600'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-gradient-to-r from-primary to-primary-600 text-white shadow-md'
+                        : 'text-gray-700 hover:bg-primary-50 hover:text-primary-600'
                     )}
                   >
                     <IconComponent className="w-5 h-5" />
@@ -148,13 +166,13 @@ export default function Navigation() {
                 );
               })}
 
-              <div className="border-t pt-2 mt-2">
+              <div className="border-t border-gray-200 pt-4 mt-4">
                 {user ? (
                   <>
                     <Link
                       href="/dashboard"
                       onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                      className="flex items-center space-x-3 px-5 py-3.5 rounded-2xl text-sm font-semibold text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-all duration-300"
                     >
                       <Icons.user className="w-5 h-5" />
                       <span>Dashboard</span>
@@ -162,7 +180,7 @@ export default function Navigation() {
                     <Link
                       href="/upgrade"
                       onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium text-primary-600 hover:bg-primary-50"
+                      className="flex items-center space-x-3 px-5 py-3.5 rounded-2xl text-sm font-semibold bg-gradient-to-r from-coral to-coral-600 text-white shadow-md mt-2"
                     >
                       <Icons.award className="w-5 h-5" />
                       <span>Upgrade to Pro</span>
@@ -173,7 +191,7 @@ export default function Navigation() {
                     <Link
                       href="/login"
                       onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                      className="flex items-center space-x-3 px-5 py-3.5 rounded-2xl text-sm font-semibold text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-all duration-300"
                     >
                       <Icons.user className="w-5 h-5" />
                       <span>Login</span>
@@ -181,10 +199,10 @@ export default function Navigation() {
                     <Link
                       href="/signup"
                       onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium text-primary-600 hover:bg-primary-50"
+                      className="flex items-center space-x-3 px-5 py-3.5 rounded-2xl text-sm font-semibold bg-gradient-to-r from-primary to-primary-600 text-white shadow-md mt-2"
                     >
                       <Icons.checkmark className="w-5 h-5" />
-                      <span>Sign Up</span>
+                      <span>Sign Up Free</span>
                     </Link>
                   </>
                 )}

@@ -170,7 +170,7 @@ export default async function HomePage() {
                   {/* Product Circle */}
                   <div className="relative w-full h-full bg-white rounded-full shadow-2xl flex items-center justify-center overflow-hidden border-8 border-white">
                     <Image
-                      src="/images/hero-image.jpg"
+                      src="https://images.unsplash.com/photo-1628594107295-1c0e1e3e1bde?w=400&h=400&fit=crop"
                       alt="Baby food safety testing and ratings"
                       width={350}
                       height={350}
@@ -333,11 +333,13 @@ export default async function HomePage() {
                 },
                 {
                   age: "6-12 Months",
-                  image: "/images/6-month.jpg",
+                  image:
+                    "https://images.unsplash.com/photo-1511029605723-7c753325ed2f?w=300&h=300&fit=crop",
                 },
                 {
                   age: "12-24 Months",
-                  image: "/images/2-year.jpg",
+                  image:
+                    "https://images.unsplash.com/photo-1500975289215-e7c43e5878b7?w=300&h=300&fit=crop",
                 },
                 {
                   age: "2+ Years",

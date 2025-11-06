@@ -333,11 +333,12 @@ export default async function HomePage() {
                 },
                 {
                   age: "6-12 Months",
-                  image: "/images/6-month.jpg",
+                  image: "/images/2-year.jpg",
                 },
                 {
                   age: "12-24 Months",
-                  image: "/images/2-year.jpg",
+                  image:
+                    "https://images.unsplash.com/photo-1500975289215-e7c43e5878b7?w=300&h=300&fit=crop",
                 },
                 {
                   age: "2+ Years",

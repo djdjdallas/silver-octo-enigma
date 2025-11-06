@@ -1,7 +1,7 @@
 // Barcode scanner page
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useSubscription } from '@/contexts/SubscriptionContext';
@@ -18,9 +18,28 @@ import toast from 'react-hot-toast';
 
 export default function ScanPage() {
   const [loading, setLoading] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
   const router = useRouter();
   const supabase = createClient();
   const { incrementScanCount } = useSubscription();
+
+  // Check authentication
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        // Redirect to login with return URL
+        const currentPath = window.location.pathname;
+        router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+        return;
+      }
+
+      setAuthChecking(false);
+    }
+
+    checkAuth();
+  }, [router]);
 
   const handleBarcodeScanned = async (barcode) => {
     setLoading(true);
@@ -60,6 +79,18 @@ export default function ScanPage() {
   const handleScanError = (error) => {
     toast.error(error);
   };
+
+  // Show loading screen while checking authentication
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-coral-50 flex items-center justify-center">
+        <div className="text-center">
+          <Icons.spinner className="w-16 h-16 text-primary-500 mx-auto mb-4 animate-spin" />
+          <p className="text-lg text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-coral-50 relative overflow-hidden">
