@@ -18,8 +18,9 @@ const PLANS = [
     price: 5.99,
     interval: 'month',
     priceId: process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID,
-    description: 'Billed monthly',
+    description: '7-day free trial, then billed monthly',
     savings: null,
+    trial: '7-day free trial',
   },
   {
     id: 'annual',
@@ -198,7 +199,12 @@ export default function UpgradePage() {
                     </span>
                     <span className="text-gray-600 ml-2">/{plan.interval}</span>
                   </div>
-                  {plan.savings && (
+                  {plan.trial && (
+                    <Badge variant="success" className="mt-3">
+                      {plan.trial}
+                    </Badge>
+                  )}
+                  {plan.savings && !plan.trial && (
                     <Badge variant="success" className="mt-3">
                       {plan.savings}
                     </Badge>
@@ -221,6 +227,8 @@ export default function UpgradePage() {
                     </>
                   ) : isPro ? (
                     'Current Plan'
+                  ) : plan.trial ? (
+                    'Start Free Trial'
                   ) : (
                     `Subscribe ${plan.name}`
                   )}
@@ -287,6 +295,19 @@ export default function UpgradePage() {
           </h2>
 
           <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">How does the 7-day free trial work?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Start your monthly subscription with a 7-day free trial. You won't be charged during
+                  the trial period. Cancel anytime before the trial ends to avoid being charged. If you
+                  love it, do nothing and your subscription will continue automatically.
+                </p>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Can I cancel anytime?</CardTitle>
