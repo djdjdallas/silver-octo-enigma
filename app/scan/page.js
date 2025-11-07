@@ -1,30 +1,40 @@
-// Barcode scanner page
+/**
+ * Scan Page - Photo-Based Product Scanning
+ *
+ * Allows users to scan products by taking photos instead of using unreliable barcode scanners.
+ * The AI extracts the barcode, product name, brand, and ingredients from the photo.
+ *
+ * Flow:
+ * 1. User takes photo or selects from gallery
+ * 2. Scanning animation plays while AI processes
+ * 3. Product lookup via unified lookup action
+ * 4. Route to appropriate product page
+ *
+ * @route /scan
+ */
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { useSubscription } from '@/contexts/SubscriptionContext';
+import { PhotoCapture } from '@/components/PhotoCapture';
+import { scanProductPhoto } from '@/app/actions/photoScan';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Icons } from '@/components/icons';
-import BarcodeScanner from '@/components/BarcodeScanner';
-import ModernBarcodeScanner from '@/components/ModernBarcodeScanner';
-import ZXingScanner from '@/components/ZXingScanner';
-import Disclaimer from '@/components/Disclaimer';
-import {
-  CircleDecoration,
-  FruitIllustration,
-} from '@/components/DecorativeElements';
-import toast from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 export default function ScanPage() {
-  const [loading, setLoading] = useState(false);
-  const [authChecking, setAuthChecking] = useState(true);
-  const [scannerMode, setScannerMode] = useState('classic'); // 'classic', 'modern', or 'zxing'
   const router = useRouter();
   const supabase = createClient();
   const { incrementScanCount } = useSubscription();
+
+  const [error, setError] = useState(null);
+  const [authChecking, setAuthChecking] = useState(true);
+  const [showManualInput, setShowManualInput] = useState(false);
+  const [manualBarcode, setManualBarcode] = useState('');
 
   // Check authentication
   useEffect(() => {
@@ -42,45 +52,78 @@ export default function ScanPage() {
     }
 
     checkAuth();
-  }, [router]);
+  }, [router, supabase]);
 
-  const handleBarcodeScanned = async (barcode) => {
-    setLoading(true);
-    toast.loading('Looking up product...');
+  /**
+   * Handle photo capture and processing
+   */
+  const handlePhotoCapture = async (imageBase64) => {
+    setError(null);
 
     try {
-      // Search for product by barcode
-      const { data: product, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('barcode', barcode)
-        .single();
+      console.log('Processing captured photo...');
 
-      toast.dismiss();
+      const result = await scanProductPhoto(imageBase64);
 
-      if (error || !product) {
-        // Product not found
-        toast.error('Product not found in database');
-        setLoading(false);
+      if (!result.success) {
+        setError(result.error || 'Failed to scan product');
+        console.error('Scan failed:', result);
         return;
       }
 
-      // Increment scan count for conversion tracking
+      console.log('Scan successful!', result);
+
+      // Increment scan count for analytics
       incrementScanCount();
 
-      // Product found - redirect to product page
-      toast.success('Product found!');
-      router.push(`/product/${product.id}`);
-    } catch (error) {
-      console.error('Error looking up product:', error);
-      toast.dismiss();
-      toast.error('Error looking up product');
-      setLoading(false);
+      // Route based on lookup result type
+      const { lookupResult } = result;
+
+      if (lookupResult.type === 'lab_tested') {
+        // Navigate to lab-tested product page
+        console.log('Routing to lab-tested product:', lookupResult.product.id);
+        router.push(`/product/${lookupResult.product.id}`);
+      } else if (lookupResult.type === 'ai_analyzed') {
+        // Navigate to AI-analyzed product page
+        console.log('Routing to AI-analyzed product:', lookupResult.product.id);
+        router.push(`/ai-product/${lookupResult.product.id}`);
+      } else if (lookupResult.type === 'not_found') {
+        setError('Product not found in any database. Try again or request lab testing.');
+      } else {
+        setError('Unable to analyze product. Please try again.');
+      }
+    } catch (err) {
+      console.error('Scan error:', err);
+      setError('An unexpected error occurred. Please try again.');
     }
   };
 
-  const handleScanError = (error) => {
-    toast.error(error);
+  /**
+   * Handle manual barcode entry
+   */
+  const handleManualSubmit = async () => {
+    if (!manualBarcode.trim()) return;
+
+    // Import and use the lookup action directly
+    const { lookupProduct } = await import('@/app/actions/productLookup');
+
+    try {
+      setError(null);
+      const result = await lookupProduct(manualBarcode.trim());
+
+      if (result.type === 'lab_tested') {
+        router.push(`/product/${result.product.id}`);
+      } else if (result.type === 'ai_analyzed') {
+        router.push(`/ai-product/${result.product.id}`);
+      } else if (result.type === 'not_found') {
+        setError('Product not found. Please check the barcode and try again.');
+      } else {
+        setError('Unable to look up product. Please try again.');
+      }
+    } catch (err) {
+      console.error('Manual lookup error:', err);
+      setError('Failed to look up product. Please try again.');
+    }
   };
 
   // Show loading screen while checking authentication
@@ -97,172 +140,137 @@ export default function ScanPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-coral-50 relative overflow-hidden">
-      {/* Decorative Elements */}
-      <div className="absolute top-10 right-10 opacity-20 z-0">
-        <FruitIllustration type="banana" className="w-16 h-16 md:w-24 md:h-24" />
-      </div>
-      <div className="absolute bottom-20 left-10 opacity-20 z-0">
-        <FruitIllustration type="strawberry" className="w-12 h-12 md:w-20 md:h-20" />
-      </div>
-      <CircleDecoration className="absolute top-40 left-20 w-32 h-32 opacity-10 z-0" color="butter" />
-      <CircleDecoration className="absolute bottom-60 right-10 w-24 h-24 opacity-10 z-0" color="lavender" />
-
-      <div className="container mx-auto px-4 max-w-2xl py-8 relative z-10">
+      <div className="max-w-2xl mx-auto p-4 space-y-6">
         {/* Header */}
-        <div className="text-center mb-8 bg-white rounded-3xl shadow-lg p-8 md:p-10 border-2 border-primary-100 relative overflow-hidden">
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-primary-200 to-coral-200 rounded-full opacity-30 blur-2xl" />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-br from-butter-200 to-lavender-200 rounded-full opacity-30 blur-2xl" />
-
-          <div className="relative z-10">
-            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-3">
-              Scan Product Barcode 📱
-            </h1>
-            <p className="text-lg text-gray-600">
-              Use your camera to scan the barcode on any baby food product
-            </p>
-          </div>
+        <div className="text-center pt-8 pb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            Scan Product 📸
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Take a photo to check heavy metals and safety ratings
+          </p>
         </div>
 
-        {/* Disclaimer */}
-        <div className="mb-6">
-          <Disclaimer variant="full" />
-        </div>
-
-        {/* Scanner Toggle - Temporary for troubleshooting */}
-        <Card className="mb-4 rounded-3xl border-0 shadow-xl bg-amber-50">
-          <CardContent className="p-4">
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Icons.alertCircle className="w-5 h-5 text-amber-600" />
-                <p className="text-sm font-medium text-amber-900">
-                  Scanner Options (Troubleshooting)
-                </p>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <Button
-                  variant={scannerMode === 'classic' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setScannerMode('classic')}
-                  className="text-xs"
-                >
-                  Classic
-                </Button>
-                <Button
-                  variant={scannerMode === 'modern' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setScannerMode('modern')}
-                  className="text-xs"
-                >
-                  Modern
-                </Button>
-                <Button
-                  variant={scannerMode === 'zxing' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setScannerMode('zxing')}
-                  className="text-xs"
-                >
-                  ZXing
-                </Button>
-              </div>
-              <p className="text-xs text-amber-700">
-                Currently using: {
-                  scannerMode === 'classic' ? 'Classic Scanner (html5-qrcode)' :
-                  scannerMode === 'modern' ? 'Modern Scanner (react-qr-scanner)' :
-                  'ZXing Scanner (direct library)'
-                }
-              </p>
-              <p className="text-xs text-amber-600">
-                If one scanner doesn't work, try switching to another option.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Scanner */}
-        {scannerMode === 'modern' ? (
-          <ModernBarcodeScanner
-            onScan={handleBarcodeScanned}
-            onError={handleScanError}
-          />
-        ) : scannerMode === 'zxing' ? (
-          <ZXingScanner
-            onScan={handleBarcodeScanned}
-            onError={handleScanError}
-          />
-        ) : (
-          <BarcodeScanner
-            onScan={handleBarcodeScanned}
-            onError={handleScanError}
-          />
+        {/* Error Display */}
+        {error && (
+          <Alert variant="destructive" className="rounded-3xl">
+            <Icons.alertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
-        {/* Product Not Found Card */}
-        <Card className="mt-6 rounded-3xl border-0 shadow-xl bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-300 rounded-full opacity-20 -mr-16 -mt-16" />
-          <CardContent className="p-8 relative z-10">
-            <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
-                <Icons.info className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="font-bold text-gray-900 mb-2 text-xl">
-                  Product Not in Database?
-                </h3>
-                <p className="text-gray-700 mb-4 leading-relaxed">
-                  If we don't have your product yet, you can request it to be added.
-                  We're constantly adding new products based on user requests.
-                </p>
-                <Button className="bg-primary hover:bg-primary-600 rounded-full">
-                  Request Product
-                </Button>
-              </div>
-            </div>
+        {/* Photo Capture Component */}
+        <PhotoCapture
+          onPhotoCapture={handlePhotoCapture}
+          onCancel={() => router.push('/')}
+        />
+
+        {/* Manual Entry Option */}
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="h-px flex-1 bg-gray-300" />
+            <p className="text-sm text-gray-600 font-medium">OR</p>
+            <div className="h-px flex-1 bg-gray-300" />
+          </div>
+
+          {!showManualInput ? (
+            <Button
+              variant="outline"
+              onClick={() => setShowManualInput(true)}
+              className="rounded-full"
+            >
+              <Icons.keyboard className="w-4 h-4 mr-2" />
+              Enter Barcode Manually
+            </Button>
+          ) : (
+            <Card className="rounded-3xl border-0 shadow-xl">
+              <CardContent className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    UPC Barcode Number
+                  </label>
+                  <input
+                    type="text"
+                    value={manualBarcode}
+                    onChange={(e) => setManualBarcode(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleManualSubmit();
+                      }
+                    }}
+                    placeholder="e.g., 051000013897"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-full text-center text-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    maxLength={14}
+                  />
+                </div>
+
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowManualInput(false);
+                      setManualBarcode('');
+                    }}
+                    className="flex-1 rounded-full"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleManualSubmit}
+                    className="flex-1 rounded-full"
+                    disabled={!manualBarcode.trim()}
+                  >
+                    <Icons.search className="w-4 h-4 mr-2" />
+                    Look Up
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Photo Tips */}
+        <Card className="rounded-3xl border-0 shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50">
+          <CardContent className="p-6">
+            <h3 className="font-bold text-gray-900 mb-3 flex items-center">
+              <Icons.lightbulb className="w-5 h-5 mr-2 text-blue-600" />
+              Photo Tips for Best Results
+            </h3>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li className="flex items-start">
+                <span className="text-blue-600 mr-2 font-bold">✓</span>
+                <span>Make sure the barcode is clearly visible and in focus</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-600 mr-2 font-bold">✓</span>
+                <span>Include the product name and brand in the photo</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-600 mr-2 font-bold">✓</span>
+                <span>Use good lighting - avoid shadows on the barcode</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-600 mr-2 font-bold">✓</span>
+                <span>You can also photograph the ingredients list for better analysis</span>
+              </li>
+            </ul>
           </CardContent>
         </Card>
 
-        {/* Alternative Search */}
-        <div className="mt-8 text-center">
-          <p className="text-lg text-gray-600 mb-4 font-medium">
-            Having trouble scanning?
+        {/* Alternative Actions */}
+        <div className="text-center space-y-3">
+          <p className="text-sm text-gray-600">
+            Prefer to search by name?
           </p>
           <Button
             variant="outline"
             onClick={() => router.push('/search')}
-            className="rounded-full border-2 px-8"
+            className="rounded-full border-2 px-6"
           >
             <Icons.search className="w-5 h-5 mr-2" />
             Search Manually
           </Button>
         </div>
-
-        {/* Supported Barcodes */}
-        <Card className="mt-8 rounded-3xl border-0 shadow-xl bg-white">
-          <CardContent className="p-8">
-            <h3 className="font-bold text-gray-900 mb-4 text-xl">
-              Supported Barcode Types
-            </h3>
-            <ul className="space-y-3">
-              <li className="flex items-center space-x-3 p-4 bg-green-50 rounded-2xl">
-                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                  <Icons.checkmark className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-gray-700 font-medium">UPC-A and UPC-E (most common in US)</span>
-              </li>
-              <li className="flex items-center space-x-3 p-4 bg-green-50 rounded-2xl">
-                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                  <Icons.checkmark className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-gray-700 font-medium">EAN-13 and EAN-8 (international)</span>
-              </li>
-              <li className="flex items-center space-x-3 p-4 bg-green-50 rounded-2xl">
-                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                  <Icons.checkmark className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-gray-700 font-medium">QR codes (some products)</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

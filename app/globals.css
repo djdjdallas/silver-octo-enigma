@@ -41,6 +41,15 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Animation delay utilities for scanning animation */
+  .delay-75 {
+    animation-delay: 75ms;
+  }
+
+  .delay-150 {
+    animation-delay: 150ms;
+  }
 }
 
 /* Custom scrollbar styling */

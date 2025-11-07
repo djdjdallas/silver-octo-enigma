@@ -66,6 +66,7 @@ import {
   Utensils,
   Beaker,
   ChefHat,
+  Image,
 } from 'lucide-react';
 
 export const Icons = {
@@ -121,7 +122,9 @@ export const Icons = {
   refreshCw: RefreshCw,
   utensils: Utensils,
   beaker: Beaker,
+  flask: Beaker, // Using Beaker as Flask (Flask not available in lucide-react)
   chef: ChefHat,
+  image: Image,
   // Food categories
   apple: Apple,
   cookie: Cookie,
@@ -210,4 +213,5 @@ export {
   Utensils,
   Beaker,
   ChefHat as Chef,
+  Image,
 };
