@@ -16,7 +16,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -37,6 +37,16 @@ export function PhotoCapture({ onPhotoCapture, onCancel }) {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const [showCamera, setShowCamera] = useState(false);
+
+  // Cleanup function to stop camera stream
+  useEffect(() => {
+    return () => {
+      // Stop camera stream when component unmounts
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   /**
    * Handle file selection from gallery
@@ -61,6 +71,8 @@ export function PhotoCapture({ onPhotoCapture, onCancel }) {
    */
   const openCamera = async () => {
     try {
+      console.log('Requesting camera access...');
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment', // Use back camera on mobile
@@ -69,14 +81,68 @@ export function PhotoCapture({ onPhotoCapture, onCancel }) {
         }
       });
 
+      console.log('Camera access granted, stream:', stream);
+      console.log('Video tracks:', stream.getVideoTracks());
+
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
+
+      // Show camera UI first
       setShowCamera(true);
+
+      // Wait for next tick to ensure video element is rendered
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      if (videoRef.current) {
+        console.log('Setting up video element...');
+
+        // Fix for React's muted attribute bug and Safari black screen
+        videoRef.current.muted = true;
+        videoRef.current.defaultMuted = true;
+
+        // Set srcObject
+        videoRef.current.srcObject = stream;
+
+        // Wait for metadata to load before playing (fixes Safari black screen)
+        videoRef.current.onloadedmetadata = () => {
+          console.log('Video metadata loaded');
+          // Small delay before playing helps with Safari
+          setTimeout(() => {
+            if (videoRef.current) {
+              console.log('Attempting to play video...');
+              videoRef.current.play()
+                .then(() => console.log('Video playing successfully'))
+                .catch(err => {
+                  console.error('Error playing video:', err);
+                });
+            }
+          }, 100);
+        };
+
+        // Also handle the canplay event as a fallback
+        videoRef.current.oncanplay = () => {
+          console.log('Video can play');
+        };
+      } else {
+        console.error('Video ref is null after showing camera');
+      }
     } catch (error) {
       console.error('Camera access error:', error);
-      alert('Could not access camera. Please use "Choose from Gallery" instead.');
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+
+      let errorMessage = 'Could not access camera. ';
+
+      if (error.name === 'NotAllowedError') {
+        errorMessage += 'Permission denied. Please allow camera access in your browser settings.';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage += 'No camera found on this device.';
+      } else if (error.name === 'NotReadableError') {
+        errorMessage += 'Camera is already in use by another application.';
+      } else {
+        errorMessage += 'Please use "Choose from Gallery" instead.';
+      }
+
+      alert(errorMessage);
     }
   };
 
@@ -162,6 +228,8 @@ export function PhotoCapture({ onPhotoCapture, onCancel }) {
               autoPlay
               playsInline
               muted
+              webkit-playsinline="true"
+              preload="auto"
               className="w-full h-full object-cover"
             />
 
