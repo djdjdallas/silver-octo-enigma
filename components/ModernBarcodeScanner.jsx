@@ -13,13 +13,32 @@ export default function ModernBarcodeScanner({ onScan, onError }) {
   const [error, setError] = useState(null);
   const [manualInput, setManualInput] = useState('');
   const [showManualInput, setShowManualInput] = useState(false);
+  const [debugInfo, setDebugInfo] = useState('');
 
   const handleScan = (result) => {
-    if (!result) return;
+    // Add debugging
+    console.log('Scanner result:', result);
+    setDebugInfo(`Scan attempt: ${JSON.stringify(result)}`);
 
-    const scannedValue = typeof result === 'string' ? result : result[0]?.rawValue;
+    if (!result || result.length === 0) {
+      return;
+    }
+
+    // Handle different result formats
+    let scannedValue = null;
+    if (typeof result === 'string') {
+      scannedValue = result;
+    } else if (Array.isArray(result) && result.length > 0) {
+      scannedValue = result[0]?.rawValue || result[0]?.text || result[0];
+    } else if (result.text) {
+      scannedValue = result.text;
+    } else if (result.rawValue) {
+      scannedValue = result.rawValue;
+    }
+
     if (scannedValue) {
       console.log('Barcode scanned with modern scanner:', scannedValue);
+      setDebugInfo(`Found: ${scannedValue}`);
 
       // Vibrate on successful scan
       if (navigator.vibrate) {
@@ -54,6 +73,7 @@ export default function ModernBarcodeScanner({ onScan, onError }) {
 
   const startScanning = () => {
     setError(null);
+    setDebugInfo('Scanner starting...');
     setIsScanning(true);
   };
 
@@ -71,6 +91,13 @@ export default function ModernBarcodeScanner({ onScan, onError }) {
         </Alert>
       )}
 
+      {/* Debug info */}
+      {debugInfo && (
+        <div className="text-xs text-gray-500 p-2 bg-gray-100 rounded">
+          Status: {debugInfo}
+        </div>
+      )}
+
       {/* Scanner viewport */}
       <Card>
         <CardContent className="p-0 relative">
@@ -80,11 +107,8 @@ export default function ModernBarcodeScanner({ onScan, onError }) {
                 onScan={handleScan}
                 onError={handleError}
                 constraints={{
-                  video: {
-                    facingMode: 'environment',
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                  }
+                  facingMode: 'environment',
+                  // Simplified constraints for better compatibility
                 }}
                 formats={[
                   'qr_code',
@@ -98,10 +122,14 @@ export default function ModernBarcodeScanner({ onScan, onError }) {
                   'codabar',
                   'data_matrix',
                   'pdf417',
+                  'itf',
+                  'aztec',
                 ]}
+                paused={false} // Ensure scanning is not paused
                 components={{
                   audio: false, // Disable audio
                   finder: true, // Show finder frame
+                  torch: false, // Disable torch button
                   zoom: false, // Disable zoom controls
                 }}
                 styles={{
@@ -112,12 +140,10 @@ export default function ModernBarcodeScanner({ onScan, onError }) {
                   video: {
                     width: '100%',
                     height: 'auto',
-                    aspectRatio: '16/9',
                     objectFit: 'cover',
                   },
-                  finderBorder: 2,
                 }}
-                scanDelay={500} // Scan every 500ms
+                scanDelay={300} // Scan every 300ms for faster detection
               />
 
               {/* Overlay instructions */}

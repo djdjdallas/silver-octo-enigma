@@ -130,10 +130,8 @@ export default function BarcodeScanner({ onScan, onError }) {
         experimentalFeatures: {
           useBarCodeDetectorIfSupported: true // Use native API if available
         },
-        verbose: false, // Disable verbose logging in production
-        supportedScanTypes: [
-          Html5Qrcode.SCAN_TYPE.SCAN_TYPE_CAMERA
-        ]
+        verbose: false // Disable verbose logging in production
+        // Removed supportedScanTypes as it's causing the error
       };
 
       setDebugInfo('Starting camera...');

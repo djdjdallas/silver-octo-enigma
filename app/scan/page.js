@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import ModernBarcodeScanner from '@/components/ModernBarcodeScanner';
+import ZXingScanner from '@/components/ZXingScanner';
 import Disclaimer from '@/components/Disclaimer';
 import {
   CircleDecoration,
@@ -20,7 +21,7 @@ import toast from 'react-hot-toast';
 export default function ScanPage() {
   const [loading, setLoading] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
-  const [useModernScanner, setUseModernScanner] = useState(false);
+  const [scannerMode, setScannerMode] = useState('classic'); // 'classic', 'modern', or 'zxing'
   const router = useRouter();
   const supabase = createClient();
   const { incrementScanCount } = useSubscription();
@@ -130,32 +131,61 @@ export default function ScanPage() {
         {/* Scanner Toggle - Temporary for troubleshooting */}
         <Card className="mb-4 rounded-3xl border-0 shadow-xl bg-amber-50">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="space-y-3">
               <div className="flex items-center space-x-2">
-                <Icons.info className="w-5 h-5 text-amber-600" />
+                <Icons.alertCircle className="w-5 h-5 text-amber-600" />
                 <p className="text-sm font-medium text-amber-900">
-                  Scanner Mode
+                  Scanner Options (Troubleshooting)
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setUseModernScanner(!useModernScanner)}
-                className="text-xs"
-              >
-                {useModernScanner ? 'Switch to Classic' : 'Switch to Modern'}
-              </Button>
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  variant={scannerMode === 'classic' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setScannerMode('classic')}
+                  className="text-xs"
+                >
+                  Classic
+                </Button>
+                <Button
+                  variant={scannerMode === 'modern' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setScannerMode('modern')}
+                  className="text-xs"
+                >
+                  Modern
+                </Button>
+                <Button
+                  variant={scannerMode === 'zxing' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setScannerMode('zxing')}
+                  className="text-xs"
+                >
+                  ZXing
+                </Button>
+              </div>
+              <p className="text-xs text-amber-700">
+                Currently using: {
+                  scannerMode === 'classic' ? 'Classic Scanner (html5-qrcode)' :
+                  scannerMode === 'modern' ? 'Modern Scanner (react-qr-scanner)' :
+                  'ZXing Scanner (direct library)'
+                }
+              </p>
+              <p className="text-xs text-amber-600">
+                If one scanner doesn't work, try switching to another option.
+              </p>
             </div>
-            <p className="text-xs text-amber-700 mt-2">
-              Currently using: {useModernScanner ? 'Modern Scanner (Beta)' : 'Classic Scanner'}
-              {!useModernScanner && ' - If not working, try Modern Scanner'}
-            </p>
           </CardContent>
         </Card>
 
         {/* Scanner */}
-        {useModernScanner ? (
+        {scannerMode === 'modern' ? (
           <ModernBarcodeScanner
+            onScan={handleBarcodeScanned}
+            onError={handleScanError}
+          />
+        ) : scannerMode === 'zxing' ? (
+          <ZXingScanner
             onScan={handleBarcodeScanned}
             onError={handleScanError}
           />
