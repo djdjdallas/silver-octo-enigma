@@ -39,12 +39,12 @@ export default function BarcodeScanner({ onScan, onError }) {
         throw new Error('Camera API not available. Please use a modern browser.');
       }
 
-      // Get available cameras
+      // Important: Use Html5Qrcode.getCameras() directly, not from instance
       const devices = await Html5Qrcode.getCameras();
 
       if (devices && devices.length > 0) {
-        setDebugInfo(`Found ${devices.length} camera(s)`);
-        return true;
+        setDebugInfo(`Found ${devices.length} camera(s): ${devices.map(d => d.label || d.id).join(', ')}`);
+        return devices; // Return devices for later use
       } else {
         throw new Error('No cameras found on this device');
       }
@@ -61,9 +61,9 @@ export default function BarcodeScanner({ onScan, onError }) {
     setDebugInfo('Initializing scanner...');
 
     try {
-      // First check camera availability
-      const hasCamera = await checkCameraAvailability();
-      if (!hasCamera) {
+      // First check camera availability and get devices
+      const cameras = await checkCameraAvailability();
+      if (!cameras || cameras.length === 0) {
         setIsInitializing(false);
         return;
       }
@@ -72,7 +72,7 @@ export default function BarcodeScanner({ onScan, onError }) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
-            facingMode: 'environment' // Try to use back camera
+            facingMode: 'environment' // Try to use back camera (without "exact")
           }
         });
         stream.getTracks().forEach(track => track.stop()); // Stop the test stream
@@ -87,14 +87,26 @@ export default function BarcodeScanner({ onScan, onError }) {
         } else if (permissionError.name === 'NotFoundError') {
           setError('No camera found. Please ensure your device has a camera.');
         } else if (permissionError.name === 'NotReadableError') {
-          setError('Camera is already in use by another application.');
+          setError('Camera is already in use by another application. Please close other apps using the camera.');
+        } else if (permissionError.name === 'OverconstrainedError') {
+          // Try again without constraints
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            stream.getTracks().forEach(track => track.stop());
+            setHasPermission(true);
+            setDebugInfo('Camera permission granted (fallback)');
+          } catch (fallbackError) {
+            setError(`Camera error: ${fallbackError.message}`);
+            setHasPermission(false);
+            setIsInitializing(false);
+            return;
+          }
         } else {
           setError(`Camera error: ${permissionError.message}`);
+          setHasPermission(false);
+          setIsInitializing(false);
+          return;
         }
-
-        setHasPermission(false);
-        setIsInitializing(false);
-        return;
       }
 
       // Initialize scanner with better configuration
@@ -103,58 +115,67 @@ export default function BarcodeScanner({ onScan, onError }) {
 
       // Calculate responsive qrbox size based on screen width
       const screenWidth = window.innerWidth;
-      const qrboxSize = Math.min(screenWidth * 0.7, 250); // Smaller for mobile
+      const qrboxSize = Math.min(screenWidth * 0.6, 250); // Adjusted for better mobile experience
 
-      // Mobile-optimized configuration
+      // Enhanced configuration with all barcode formats
       const config = {
         fps: 10,
         qrbox: {
           width: qrboxSize,
           height: qrboxSize
         },
-        // Add more configuration for better mobile support
-        formatsToSupport: [
-          // Common barcode formats
-          Html5Qrcode.SCAN_TYPE_CAMERA
-        ],
+        aspectRatio: 1.777778, // 16:9 aspect ratio
+        disableFlip: false, // Allow flipping for front camera
+        // Ensure barcode formats are properly supported
         experimentalFeatures: {
           useBarCodeDetectorIfSupported: true // Use native API if available
         },
-        verbose: true // Enable verbose logging for debugging
+        verbose: false, // Disable verbose logging in production
+        supportedScanTypes: [
+          Html5Qrcode.SCAN_TYPE.SCAN_TYPE_CAMERA
+        ]
       };
 
       setDebugInfo('Starting camera...');
 
-      // Try to get available cameras and use the back camera
-      const cameras = await Html5Qrcode.getCameras();
+      // Find the best camera to use
       let cameraIdToUse = cameras[0]?.id; // Default to first camera
 
       // Try to find back/environment camera
       if (cameras.length > 1) {
-        const backCamera = cameras.find(camera =>
-          camera.label.toLowerCase().includes('back') ||
-          camera.label.toLowerCase().includes('environment')
-        );
+        // Look for back camera keywords
+        const backCamera = cameras.find(camera => {
+          const label = (camera.label || '').toLowerCase();
+          return label.includes('back') ||
+                 label.includes('environment') ||
+                 label.includes('rear') ||
+                 label.includes('facing back');
+        });
+
         if (backCamera) {
           cameraIdToUse = backCamera.id;
+          setDebugInfo(`Using back camera: ${backCamera.label}`);
         } else {
           // On mobile, usually the last camera is the back camera
           cameraIdToUse = cameras[cameras.length - 1].id;
+          setDebugInfo(`Using camera: ${cameras[cameras.length - 1].label || 'Camera ' + (cameras.length - 1)}`);
         }
       }
 
+      // Start the scanner with proper error handling
       await html5QrCode.start(
-        cameraIdToUse || { facingMode: 'environment' },
+        cameraIdToUse || { facingMode: 'environment' }, // Fallback to facingMode without "exact"
         config,
-        (decodedText) => {
+        (decodedText, decodedResult) => {
           // Barcode detected
-          console.log('Barcode scanned:', decodedText);
+          console.log('Barcode scanned:', decodedText, decodedResult);
 
           // Vibrate on successful scan (if supported)
           if (navigator.vibrate) {
             navigator.vibrate(200);
           }
 
+          // Stop scanning before calling onScan to prevent multiple scans
           stopScanning();
           if (onScan) {
             onScan(decodedText);
@@ -162,10 +183,37 @@ export default function BarcodeScanner({ onScan, onError }) {
         },
         (errorMessage) => {
           // Scanning error (normal during scanning, don't show to user)
-          // Only log for debugging
-          // console.log('Scan attempt:', errorMessage);
+          // This is called for every frame that doesn't have a QR code
         }
-      );
+      ).catch(async (err) => {
+        console.error('Scanner start error:', err);
+
+        // Try fallback configuration if initial start fails
+        if (err.message?.includes('OverconstrainedError') || err.message?.includes('Constraints')) {
+          try {
+            // Try with just basic video constraint
+            await html5QrCode.start(
+              { facingMode: 'environment' },
+              {
+                fps: 10,
+                qrbox: { width: 250, height: 250 }
+              },
+              (decodedText) => {
+                console.log('Barcode scanned (fallback):', decodedText);
+                if (navigator.vibrate) navigator.vibrate(200);
+                stopScanning();
+                if (onScan) onScan(decodedText);
+              },
+              () => {}
+            );
+            setDebugInfo('Scanner active (fallback mode) - position barcode in view');
+          } catch (fallbackErr) {
+            throw fallbackErr;
+          }
+        } else {
+          throw err;
+        }
+      });
 
       setIsScanning(true);
       setDebugInfo('Scanner active - position barcode in view');
@@ -182,6 +230,8 @@ export default function BarcodeScanner({ onScan, onError }) {
         errorMessage += 'Camera requires HTTPS connection.';
       } else if (err.message?.includes('NotSupported')) {
         errorMessage += 'Your browser does not support camera access.';
+      } else if (err.message?.includes('not found')) {
+        errorMessage += 'Camera not found. Please check your device.';
       } else {
         errorMessage += err.message || 'Please try refreshing the page.';
       }
@@ -234,10 +284,10 @@ export default function BarcodeScanner({ onScan, onError }) {
         </Alert>
       )}
 
-      {/* Debug info for troubleshooting */}
-      {process.env.NODE_ENV === 'development' && debugInfo && (
+      {/* Debug info for troubleshooting - temporarily enabled for all environments */}
+      {debugInfo && (
         <div className="text-xs text-gray-500 p-2 bg-gray-100 rounded">
-          Debug: {debugInfo}
+          Status: {debugInfo}
         </div>
       )}
 

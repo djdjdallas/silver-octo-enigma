@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import BarcodeScanner from '@/components/BarcodeScanner';
+import ModernBarcodeScanner from '@/components/ModernBarcodeScanner';
 import Disclaimer from '@/components/Disclaimer';
 import {
   CircleDecoration,
@@ -19,6 +20,7 @@ import toast from 'react-hot-toast';
 export default function ScanPage() {
   const [loading, setLoading] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
+  const [useModernScanner, setUseModernScanner] = useState(false);
   const router = useRouter();
   const supabase = createClient();
   const { incrementScanCount } = useSubscription();
@@ -125,11 +127,44 @@ export default function ScanPage() {
           <Disclaimer variant="full" />
         </div>
 
+        {/* Scanner Toggle - Temporary for troubleshooting */}
+        <Card className="mb-4 rounded-3xl border-0 shadow-xl bg-amber-50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Icons.info className="w-5 h-5 text-amber-600" />
+                <p className="text-sm font-medium text-amber-900">
+                  Scanner Mode
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setUseModernScanner(!useModernScanner)}
+                className="text-xs"
+              >
+                {useModernScanner ? 'Switch to Classic' : 'Switch to Modern'}
+              </Button>
+            </div>
+            <p className="text-xs text-amber-700 mt-2">
+              Currently using: {useModernScanner ? 'Modern Scanner (Beta)' : 'Classic Scanner'}
+              {!useModernScanner && ' - If not working, try Modern Scanner'}
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Scanner */}
-        <BarcodeScanner
-          onScan={handleBarcodeScanned}
-          onError={handleScanError}
-        />
+        {useModernScanner ? (
+          <ModernBarcodeScanner
+            onScan={handleBarcodeScanned}
+            onError={handleScanError}
+          />
+        ) : (
+          <BarcodeScanner
+            onScan={handleBarcodeScanned}
+            onError={handleScanError}
+          />
+        )}
 
         {/* Product Not Found Card */}
         <Card className="mt-6 rounded-3xl border-0 shadow-xl bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
