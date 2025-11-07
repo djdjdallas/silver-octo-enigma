@@ -54,7 +54,7 @@ function fetchURL(url) {
 
     const options = {
       headers: {
-        'User-Agent': 'SafeBaby-Database-Bot/1.0 (contact@safebaby.app)',
+        'User-Agent': 'SafeBaby-Database-Bot/1.0 (contact@safebaby.co)',
         'Accept': 'text/html,application/json'
       }
     };

@@ -17,11 +17,12 @@ import { formatDate, getUserTier } from '@/lib/utils';
 import ProductActions from './ProductActions';
 
 export async function generateMetadata({ params }) {
+  const { id } = await params;
   const supabase = await createClient();
   const { data: product } = await supabase
     .from('products')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   if (!product) {
@@ -124,7 +125,8 @@ async function getUserProfile() {
 }
 
 export default async function ProductDetailPage({ params }) {
-  const data = await getProductData(params.id);
+  const { id } = await params;
+  const data = await getProductData(id);
 
   if (!data) {
     notFound();

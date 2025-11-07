@@ -30,7 +30,7 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.safebaby.co';
 
   return SEO({
     title: `${product.name} Safety Rating - Heavy Metal Test Results`,

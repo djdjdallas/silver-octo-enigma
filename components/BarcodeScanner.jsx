@@ -33,10 +33,14 @@ export default function BarcodeScanner({ onScan, onError }) {
       const html5QrCode = new Html5Qrcode('qr-reader');
       html5QrCodeRef.current = html5QrCode;
 
+      // Calculate responsive qrbox size based on screen width
+      const screenWidth = window.innerWidth;
+      const qrboxSize = Math.min(screenWidth * 0.7, 300); // 70% of screen width, max 300px
+
       const config = {
         fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0,
+        qrbox: { width: qrboxSize, height: qrboxSize },
+        // Remove aspectRatio to let the library use the camera's native aspect ratio
       };
 
       await html5QrCode.start(
@@ -86,7 +90,8 @@ export default function BarcodeScanner({ onScan, onError }) {
           <div
             id="qr-reader"
             ref={scannerRef}
-            className={`w-full ${isScanning ? '' : 'hidden'}`}
+            className={`w-full ${isScanning ? 'block' : 'hidden'}`}
+            style={{ minHeight: '300px' }}
           />
 
           {/* Placeholder when not scanning */}

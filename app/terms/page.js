@@ -297,8 +297,8 @@ export default function TermsPage() {
               <CardContent className="p-4">
                 <p className="text-gray-900">
                   <strong>SafeBaby</strong><br />
-                  Email: legal@safebaby.app<br />
-                  Website: www.safebaby.app
+                  Email: legal@safebaby.co<br />
+                  Website: www.safebaby.co
                 </p>
               </CardContent>
             </Card>

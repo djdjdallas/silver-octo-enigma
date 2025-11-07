@@ -8,7 +8,7 @@ export function SEO({
   article,
   noindex = false,
 }) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.safebaby.co';
   const fullTitle = title ? `${title} | SafeBaby` : 'SafeBaby - Baby Food Safety Ratings';
   const fullDescription = description || 'Scan baby food products and check safety ratings based on independent lab testing for heavy metals like arsenic, lead, cadmium, and mercury.';
   const canonicalUrl = canonical ? `${baseUrl}${canonical}` : baseUrl;
@@ -56,7 +56,7 @@ export function SEO({
 
 // Helper function to generate JSON-LD structured data
 export function generateProductSchema(product, contaminants = []) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.safebaby.co';
 
   return {
     '@context': 'https://schema.org',
@@ -85,7 +85,7 @@ export function generateProductSchema(product, contaminants = []) {
 }
 
 export function generateOrganizationSchema() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.safebaby.co';
 
   return {
     '@context': 'https://schema.org',
@@ -100,13 +100,13 @@ export function generateOrganizationSchema() {
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Support',
-      email: 'support@safebaby.app',
+      email: 'support@safebaby.co',
     },
   };
 }
 
 export function generateBreadcrumbSchema(items) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.safebaby.co';
 
   return {
     '@context': 'https://schema.org',
@@ -121,7 +121,7 @@ export function generateBreadcrumbSchema(items) {
 }
 
 export function generateArticleSchema(article) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.safebaby.co';
 
   return {
     '@context': 'https://schema.org',

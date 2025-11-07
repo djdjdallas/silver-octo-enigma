@@ -1,6 +1,6 @@
 // Dynamic robots.txt generation
 export default function robots() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.safebaby.co';
 
   return {
     rules: [

@@ -4,7 +4,7 @@ import { generateProductSlug, getBrandSlug } from '@/lib/utils';
 
 export default async function sitemap() {
   const supabase = await createClient();
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.safebaby.co';
 
   // Get all products for product pages
   const { data: products } = await supabase
@@ -51,6 +51,74 @@ export default async function sitemap() {
       slug: 'understanding-baby-food-lead-levels-guide',
       date: '2025-01-05',
     },
+    {
+      slug: 'baby-food-heavy-metals-complete-guide',
+      date: '2025-01-05',
+    },
+    {
+      slug: 'best-organic-baby-food-safety-beyond-label',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'rice-vs-oatmeal-baby-cereal-which-is-safer',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'baby-food-pouches-safety-guide',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'gerber-baby-food-review-2025',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'happy-baby-organics-gold-standard',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'beech-nut-vs-earths-best-comparison',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'store-brand-baby-food-safety',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'arsenic-in-baby-food-rice-complete-guide',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'cadmium-in-baby-food-sweet-potatoes',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'mercury-in-baby-food-guide',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'how-baby-food-gets-contaminated',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'power-of-variety-rotation-reduces-risk',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'making-your-own-baby-food-safer',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'shopping-smart-safe-products-guide',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'transitioning-to-table-foods-toddlers',
+      date: '2025-01-06',
+    },
+    {
+      slug: 'water-quality-formula-baby-food',
+      date: '2025-01-06',
+    },
   ];
 
   const blogUrls = blogPosts.map((post) => ({
@@ -59,6 +127,55 @@ export default async function sitemap() {
     changeFrequency: 'monthly',
     priority: 0.7,
   }));
+
+  // Blog category pages
+  const blogCategories = [
+    {
+      slug: 'product-guides',
+      date: '2025-01-15',
+    },
+    {
+      slug: 'brand-reviews',
+      date: '2025-01-15',
+    },
+    {
+      slug: 'heavy-metals',
+      date: '2025-01-15',
+    },
+    {
+      slug: 'safety-tips',
+      date: '2025-01-15',
+    },
+  ];
+
+  const blogCategoryUrls = blogCategories.map((category) => ({
+    url: `${baseUrl}/blog/category/${category.slug}`,
+    lastModified: category.date,
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }));
+
+  // Tool pages
+  const toolUrls = [
+    {
+      url: `${baseUrl}/tools/contamination-checker`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/tools/arsenic-checker`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/tools/metal-detector`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+  ];
 
   // Static pages
   const staticPages = [
@@ -79,6 +196,12 @@ export default async function sitemap() {
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/scan`,
@@ -112,5 +235,7 @@ export default async function sitemap() {
     ...productSlugUrls,
     ...productIdUrls,
     ...blogUrls,
+    ...blogCategoryUrls,
+    ...toolUrls,
   ];
 }

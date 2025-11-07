@@ -283,7 +283,7 @@ export default function PrivacyPage() {
               <li><strong>Right to Non-Discrimination:</strong> Not be discriminated against for exercising your rights</li>
             </ul>
             <p className="text-gray-700 leading-relaxed mb-3">
-              To exercise these rights, contact us at privacy@safebaby.app. We will verify your identity
+              To exercise these rights, contact us at privacy@safebaby.co. We will verify your identity
               before processing your request.
             </p>
             <p className="text-gray-700 leading-relaxed">
@@ -396,12 +396,12 @@ export default function PrivacyPage() {
               <CardContent className="p-4">
                 <p className="text-gray-900 mb-3">
                   <strong>SafeBaby Privacy Team</strong><br />
-                  Email: privacy@safebaby.app<br />
-                  Website: www.safebaby.app
+                  Email: privacy@safebaby.co<br />
+                  Website: www.safebaby.co
                 </p>
                 <p className="text-sm text-gray-600">
-                  For GDPR-related inquiries: gdpr@safebaby.app<br />
-                  For CCPA-related inquiries: ccpa@safebaby.app
+                  For GDPR-related inquiries: gdpr@safebaby.co<br />
+                  For CCPA-related inquiries: ccpa@safebaby.co
                 </p>
               </CardContent>
             </Card>

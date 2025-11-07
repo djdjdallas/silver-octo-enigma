@@ -25,11 +25,11 @@ const recalls = [
     productName: 'Sprout Organics Sweet Potato Apple and Spinach Pouch',
     brand: 'Sprout Organic',
     reason: 'Elevated lead levels',
-    description: 'Sprout Organics issued a voluntary recall of Sweet Potato Apple and Spinach pouches (3.5 oz) over concerns of elevated levels of lead. The recall affects Lot Code 4212 with an expiration date of 10/29/2025. Products were distributed to Walgreens and independent stores in the southern United States between September and December 2024.',
+    description: 'Sprout Organics expanded its voluntary recall of Sweet Potato Apple and Spinach pouches (3.5 oz) due to potentially elevated lead levels. The recall now includes multiple lot codes: 4212 (Best By: Oct 29, 2025), 4213 (Best By: Oct 30, 2025), 4282 (Best By: Dec 04, 2025), and 4310 (Best By: Feb 04, 2026). Exposure to lead, even at low levels, may increase blood lead levels and affect learning and development in children. Products were sold in Walgreens and independent retailers across 27 states, as well as online. The expansion was announced on September 23, 2025 following routine sampling. No illnesses have been reported to date.',
     riskLevel: 'Class II',
-    recallDate: '2024-09-15',
-    fdaUrl: 'https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts',
-    fdaRecallId: 'F-0892-2024',
+    recallDate: '2025-09-23',
+    fdaUrl: 'https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/sprout-organics-expands-voluntary-recall-sweet-potato-apple-and-spinach-include-additional-lot-codes',
+    fdaRecallId: 'F-0892-2025',
   },
   {
     productName: 'Once Upon a Farm Organic Plant-Rich Meal, Curried Carrots & Beans',
@@ -50,6 +50,16 @@ const recalls = [
     recallDate: '2025-01-15',
     fdaUrl: 'https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts',
     fdaRecallId: 'F-0089-2025',
+  },
+  {
+    productName: 'GreenWise Pear, Kiwi, Spinach & Pea Baby Food Pouches',
+    brand: 'GreenWise',
+    reason: 'Elevated lead levels',
+    description: 'Publix Super Markets initiated a voluntary recall of GreenWise Pear, Kiwi, Spinach & Pea Baby Food pouches (4 oz) produced by Bowman Andros LLC due to potential contamination with elevated levels of lead. The product has GTIN 41415-00901 and Best If Used By date of 11/01/2025. Products were distributed to Publix grocery stores across their eight-state operating area (Florida, Georgia, Alabama, Tennessee, South Carolina, North Carolina, Virginia, and Kentucky). The recall was initiated as a result of routine sampling. No illnesses have been reported to date. Potentially impacted products have been removed from all store shelves.',
+    riskLevel: 'Class II',
+    recallDate: '2025-05-09',
+    fdaUrl: 'https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/publix-voluntarily-recalls-greenwise-pear-kiwi-spinach-pea-baby-food-pouches-due-lead',
+    fdaRecallId: 'F-0453-2025',
   },
 ];
 
