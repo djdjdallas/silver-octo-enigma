@@ -57,15 +57,16 @@ export const metadata = {
     telephone: false,
   },
   icons: {
-    icon: '/icon',
-    apple: '/apple-icon',
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
   themeColor: '#10b981',
 };
 

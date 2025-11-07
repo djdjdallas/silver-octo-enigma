@@ -1,5 +1,5 @@
 // Reusable SEO component for consistent meta tags across pages
-export function SEO({
+function SEO({
   title,
   description,
   canonical,
@@ -161,3 +161,7 @@ export function generateFAQSchema(faqs) {
     })),
   };
 }
+
+// Export SEO as both default and named export for compatibility
+export default SEO;
+export { SEO };
