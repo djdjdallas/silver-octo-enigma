@@ -8,21 +8,21 @@
  * @route /ai-product/[id]
  */
 
-import { getAIAnalyzedProduct } from "@/app/actions/productLookup";
-import { AIAnalyzedProduct } from "@/components/AIAnalyzedProduct";
-import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
-import Link from "next/link";
+import { getAIAnalyzedProduct } from '@/app/actions/productLookup';
+import { AIAnalyzedProduct } from '@/components/AIAnalyzedProduct';
+import { Button } from '@/components/ui/button';
+import { Icons } from '@/components/icons';
+import Link from 'next/link';
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
   const { id } = await params;
   const result = await getAIAnalyzedProduct(id);
 
-  if (result.type === "not_found") {
+  if (result.type === 'not_found') {
     return {
-      title: "Product Not Found | SafeBaby",
-      description: "The requested product could not be found.",
+      title: 'Product Not Found | SafeBaby',
+      description: 'The requested product could not be found.'
     };
   }
 
@@ -30,16 +30,12 @@ export async function generateMetadata({ params }) {
 
   return {
     title: `${product.name} - AI Safety Analysis | SafeBaby`,
-    description: `AI-powered safety analysis for ${product.name} by ${
-      product.brand
-    }. Overall safety score: ${
-      analysis.overallScore
-    }/100. ${analysis.recommendations.substring(0, 150)}...`,
+    description: `AI-powered safety analysis for ${product.name} by ${product.brand}. Overall safety score: ${analysis.overallScore}/100. ${analysis.recommendations.substring(0, 150)}...`,
     openGraph: {
       title: `${product.name} - AI Safety Analysis`,
       description: `Safety Score: ${analysis.overallScore}/100 - ${product.brand}`,
-      images: product.image_url ? [product.image_url] : [],
-    },
+      images: product.image_url ? [product.image_url] : []
+    }
   };
 }
 
@@ -48,7 +44,7 @@ export default async function AIProductPage({ params }) {
   const result = await getAIAnalyzedProduct(id);
 
   // Handle product not found
-  if (result.type === "not_found") {
+  if (result.type === 'not_found') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-coral-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 text-center">
@@ -59,8 +55,7 @@ export default async function AIProductPage({ params }) {
             Product Not Found
           </h1>
           <p className="text-gray-600 mb-6">
-            We couldn't find the product you're looking for. It may have been
-            removed or the link may be incorrect.
+            We couldn't find the product you're looking for. It may have been removed or the link may be incorrect.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href="/scan" className="flex-1">
@@ -135,7 +130,7 @@ export default async function AIProductPage({ params }) {
                   Scan Another Product
                 </Button>
               </Link>
-              <Link href="/search">
+              <Link href="/products">
                 <Button variant="outline" className="w-full rounded-full">
                   <Icons.package className="w-5 h-5 mr-2" />
                   Browse All Products

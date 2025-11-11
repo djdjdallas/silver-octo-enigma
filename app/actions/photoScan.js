@@ -79,32 +79,205 @@ export async function scanProductPhoto(imageBase64) {
         console.log(`  Ingredients: ${extraction.ingredients ? 'Found' : 'Not found'}`);
         console.log(`  Confidence: ${extraction.confidence}`);
 
-        // Step 2: Validate extracted barcode
-        if (!extraction.barcode || !isValidBarcode(extraction.barcode)) {
-          console.log('✗ No valid barcode found in photo');
+        // Step 2: Check what information we have
+        const hasBarcode = extraction.barcode && isValidBarcode(extraction.barcode);
+        const hasIngredients = extraction.ingredients && extraction.ingredients.length > 0;
+        const hasProductName = extraction.productName && extraction.productName.length > 0;
+        const hasBrand = extraction.brand && extraction.brand.length > 0;
 
-          // If we have product name and brand, suggest manual search
-          if (extraction.productName || extraction.brand) {
+        // We need at least product name or barcode to proceed
+        if (!hasBarcode && !hasIngredients && !hasProductName) {
+          console.log('✗ No useful information found in photo');
+          return {
+            success: false,
+            error: 'Could not identify the product',
+            suggestion: 'Please take a clearer photo showing the product name, ingredients list, or barcode.',
+            extraction
+          };
+        }
+
+        // Step 2a: Handle product name only (no barcode or ingredients)
+        if (!hasBarcode && !hasIngredients && hasProductName) {
+          console.log('✓ No barcode or ingredients, but product identified - analyzing by name');
+          console.log(`  Product: ${extraction.productName}`);
+          console.log(`  Brand: ${extraction.brand || 'Unknown'}`);
+
+          // Import AI analysis function
+          const { analyzeProductWithAI } = await import('@/lib/aiProductAnalysis');
+          const { createClient } = await import('@supabase/supabase-js');
+
+          // Create a product info object with what we know
+          const productInfo = {
+            name: extraction.productName,
+            brand: extraction.brand || 'Unknown',
+            ingredients: null, // We'll let AI infer typical ingredients
+            barcode: null
+          };
+
+          console.log('Step 2a: Analyzing product by name and type...');
+
+          // Add a note that we're analyzing based on product name only
+          productInfo.analysisNote = 'Analysis based on product name and typical ingredients for this type of product. For more accurate results, please photograph the ingredients list.';
+
+          const aiAnalysis = await analyzeProductWithAI(productInfo);
+
+          if (!aiAnalysis.success) {
             return {
               success: false,
-              error: 'Could not find a valid barcode in the photo',
-              suggestion: `We found "${extraction.productName || ''} ${extraction.brand || ''}".trim() - try searching for this product manually.`,
-              extraction // Return what we found for debugging
+              error: 'Failed to analyze product',
+              details: aiAnalysis.error
             };
           }
 
+          console.log('✓ AI analysis complete');
+
+          // Save to AI-analyzed products cache
+          const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+          );
+
+          const productData = {
+            barcode: `name-${Date.now()}-${Math.random().toString(36).substring(7)}`, // Generate unique ID
+            product_name: productInfo.name,
+            brand: productInfo.brand,
+            source: 'Photo Analysis', // Required field
+            ingredients: 'Typical ingredients inferred from product type',
+            overall_score: aiAnalysis.overallScore,
+            harmful_substances_count: aiAnalysis.harmfulSubstances.length,
+            harmful_substances_details: aiAnalysis.harmfulSubstances,
+            microplastics_risk: aiAnalysis.microplasticsRisk,
+            heavy_metals_risk: aiAnalysis.heavyMetalsRisk,
+            allergen_info: aiAnalysis.allergenInfo,
+            age_appropriateness: aiAnalysis.ageAppropriateness,
+            nutritional_concerns: aiAnalysis.nutritionalConcerns,
+            recommendations: aiAnalysis.recommendations,
+            confidence_score: aiAnalysis.confidenceScore || 75, // Lower confidence since no ingredients
+            analysis_notes: 'Analyzed from product name only (no barcode or ingredients visible). Analysis based on typical formulation.',
+            photo_extracted: true
+          };
+
+          const { data: savedProduct, error: saveError } = await supabase
+            .from('ai_analyzed_products')
+            .insert(productData)
+            .select()
+            .single();
+
+          if (saveError) {
+            console.error('Error saving AI analysis:', saveError);
+          } else {
+            console.log('✓ AI analysis saved to cache');
+          }
+
+          console.log('=== Photo Scan Complete (Name-Only) ===\n');
+
           return {
-            success: false,
-            error: 'Could not find a valid barcode in the photo',
-            suggestion: 'Please take a clearer photo showing the barcode clearly. Make sure the barcode is in focus and well-lit.',
-            extraction
+            success: true,
+            extraction,
+            lookupResult: {
+              type: 'ai_analyzed',
+              product: savedProduct || {
+                id: productData.barcode,
+                ...productData
+              },
+              analysis: aiAnalysis,
+              source: 'photo_name_only'
+            }
+          };
+        }
+
+        // Step 2b: Handle ingredient-only analysis (no barcode)
+        if (!hasBarcode && hasIngredients) {
+          console.log('✓ No barcode, but ingredients found - analyzing directly');
+          console.log(`  Product: ${extraction.productName || 'Unknown'}`);
+          console.log(`  Brand: ${extraction.brand || 'Unknown'}`);
+          console.log(`  Ingredients: ${extraction.ingredients}`);
+
+          // Import AI analysis function
+          const { analyzeProductWithAI } = await import('@/lib/aiProductAnalysis');
+          const { createClient } = await import('@supabase/supabase-js');
+
+          // Analyze ingredients with AI
+          const productInfo = {
+            name: extraction.productName || 'Unknown Product',
+            brand: extraction.brand || 'Unknown Brand',
+            ingredients: extraction.ingredients,
+            barcode: null // No barcode available
+          };
+
+          console.log('Step 2a: Analyzing ingredients with AI...');
+          const aiAnalysis = await analyzeProductWithAI(productInfo);
+
+          if (!aiAnalysis.success) {
+            return {
+              success: false,
+              error: 'Failed to analyze product ingredients',
+              details: aiAnalysis.error
+            };
+          }
+
+          console.log('✓ AI analysis complete');
+
+          // Save to AI-analyzed products cache (without barcode)
+          const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+          );
+
+          const productData = {
+            barcode: `photo-${Date.now()}-${Math.random().toString(36).substring(7)}`, // Generate unique ID
+            product_name: productInfo.name,
+            brand: productInfo.brand,
+            source: 'Photo Analysis', // Required field
+            ingredients: productInfo.ingredients,
+            overall_score: aiAnalysis.overallScore,
+            harmful_substances_count: aiAnalysis.harmfulSubstances.length,
+            harmful_substances_details: aiAnalysis.harmfulSubstances,
+            microplastics_risk: aiAnalysis.microplasticsRisk,
+            heavy_metals_risk: aiAnalysis.heavyMetalsRisk,
+            allergen_info: aiAnalysis.allergenInfo,
+            age_appropriateness: aiAnalysis.ageAppropriateness,
+            nutritional_concerns: aiAnalysis.nutritionalConcerns,
+            recommendations: aiAnalysis.recommendations,
+            confidence_score: aiAnalysis.confidenceScore,
+            analysis_notes: 'Analyzed from photo ingredients (no barcode)',
+            photo_extracted: true
+          };
+
+          const { data: savedProduct, error: saveError } = await supabase
+            .from('ai_analyzed_products')
+            .insert(productData)
+            .select()
+            .single();
+
+          if (saveError) {
+            console.error('Error saving AI analysis:', saveError);
+            // Continue anyway - we still have the analysis
+          } else {
+            console.log('✓ AI analysis saved to cache');
+          }
+
+          console.log('=== Photo Scan Complete (Ingredient-Only) ===\n');
+
+          return {
+            success: true,
+            extraction,
+            lookupResult: {
+              type: 'ai_analyzed',
+              product: savedProduct || {
+                id: productData.barcode,
+                ...productData
+              },
+              analysis: aiAnalysis,
+              source: 'photo_ingredients'
+            }
           };
         }
 
         console.log('✓ Valid barcode found:', extraction.barcode);
 
         // Step 3: Lookup product using the existing unified lookup
-        console.log('Step 2: Looking up product by barcode...');
+        console.log('Step 3: Looking up product by barcode...');
 
         const lookupResult = await lookupProduct(extraction.barcode);
 

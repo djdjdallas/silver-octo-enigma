@@ -21,7 +21,7 @@ export const metadata = {
   authors: [{ name: 'SafeBaby' }],
   creator: 'SafeBaby',
   publisher: 'SafeBaby',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://www.safebaby.co'),
   alternates: {
     canonical: '/',
   },

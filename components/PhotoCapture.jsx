@@ -198,12 +198,19 @@ export function PhotoCapture({ onPhotoCapture, onCancel }) {
     // Convert data URL to base64 (remove the prefix)
     const base64 = imageUrl.split(',')[1];
 
-    // Call parent callback with base64 image
-    // The scanning animation will continue until the parent routes to results page
-    await onPhotoCapture(base64);
+    try {
+      // Call parent callback with base64 image
+      await onPhotoCapture(base64);
 
-    // Note: We don't set isScanning back to false here because
-    // the parent will handle navigation, which will unmount this component
+      // If we reach here and still mounted, the parent didn't navigate
+      // (probably an error occurred), so stop the scanning animation and reset
+      setIsScanning(false);
+      setPreviewUrl(null); // Clear preview so user can try again
+    } catch (error) {
+      console.error('Photo capture error:', error);
+      setIsScanning(false);
+      setPreviewUrl(null); // Clear preview so user can try again
+    }
   };
 
   /**

@@ -62,11 +62,16 @@ export default function ScanPage() {
 
     try {
       console.log('Processing captured photo...');
+      console.log('Image base64 length:', imageBase64?.length);
 
       const result = await scanProductPhoto(imageBase64);
 
+      console.log('Scan result:', result);
+
       if (!result.success) {
-        setError(result.error || 'Failed to scan product');
+        const errorMsg = result.error || result.details || 'Failed to scan product';
+        const suggestion = result.suggestion || '';
+        setError(`${errorMsg}${suggestion ? ` ${suggestion}` : ''}`);
         console.error('Scan failed:', result);
         return;
       }
