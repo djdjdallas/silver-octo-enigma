@@ -11,6 +11,7 @@ import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import ScanTracker from '@/components/ScanTracker';
 import AnalyticsProvider from '@/components/AnalyticsProvider';
 import CookieConsent from '@/components/CookieConsent';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -81,6 +82,9 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#10b981" />
       </head>
       <body className={inter.className}>
+        {/* Add Google Analytics - only loads in production */}
+        <GoogleAnalytics />
+
         <Suspense fallback={null}>
           <AnalyticsProvider>
             <SubscriptionProvider>
