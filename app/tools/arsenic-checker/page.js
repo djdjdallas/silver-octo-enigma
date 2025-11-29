@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 
 export const metadata = {
   title: 'Check Baby Food Arsenic Levels Online | Free Arsenic Testing Database',
-  description: 'Check arsenic levels in baby food online. Search 500+ products for arsenic contamination. See which baby cereals, purees & snacks exceed FDA limits.',
+  description: 'Check arsenic levels in baby food online. Search 220+ verified products for arsenic contamination. See which baby cereals, purees & snacks exceed FDA limits.',
   keywords: [
     'check baby food arsenic online',
     'baby food arsenic levels',
@@ -16,7 +16,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Check Baby Food Arsenic Levels Online | Free Testing Database',
-    description: 'Check arsenic levels in baby food online. Search 500+ products for arsenic contamination.',
+    description: 'Check arsenic levels in baby food online. Search 220+ verified products for arsenic contamination.',
     url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.com'}/tools/arsenic-checker`,
     siteName: 'SafeBaby',
     type: 'website',
@@ -36,7 +36,7 @@ export default function ArsenicCheckerPage() {
             Check Baby Food Arsenic Levels Online
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Instantly check arsenic contamination in baby food products. Search our database of 500+ tested products to see inorganic arsenic levels and FDA compliance.
+            Instantly check arsenic contamination in baby food products. Search our database of 220+ verified lab-tested products to see inorganic arsenic levels and FDA compliance.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/scan">
@@ -90,8 +90,8 @@ export default function ArsenicCheckerPage() {
               <div className="text-sm text-gray-600">Worst Product ppb Level</div>
             </Card>
             <Card className="p-6 text-center bg-white rounded-3xl shadow-lg">
-              <div className="text-4xl font-bold text-primary mb-2">500+</div>
-              <div className="text-sm text-gray-600">Products in Database</div>
+              <div className="text-4xl font-bold text-primary mb-2">220+</div>
+              <div className="text-sm text-gray-600">Verified Products</div>
             </Card>
           </div>
         </section>
@@ -346,7 +346,7 @@ export default function ArsenicCheckerPage() {
             Check Arsenic Levels in Your Baby&apos;s Food Now
           </h2>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Free instant access to arsenic testing data for 500+ baby food products
+            Free instant access to arsenic testing data for 220+ verified baby food products
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/scan">

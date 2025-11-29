@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Safest Baby Food Brands 2025 | Compare Heavy Metal Levels',
-  description: 'Compare safety ratings for 500+ baby food products. See which brands have lowest lead, arsenic & cadmium. Gerber vs Beech-Nut vs Happy Baby testing results.',
+  description: 'Compare safety ratings for 220+ verified baby food products. See which brands have lowest lead, arsenic & cadmium. Gerber vs Beech-Nut vs Happy Baby testing results.',
   keywords: [
     'safest baby food brands',
     'safest baby food brands 2025',
@@ -9,7 +9,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Safest Baby Food Brands 2025 | Compare Heavy Metal Levels',
-    description: 'Compare safety ratings for 500+ baby food products. See which brands have lowest lead, arsenic & cadmium.',
+    description: 'Compare safety ratings for 220+ verified baby food products. See which brands have lowest lead, arsenic & cadmium.',
     url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.com'}/search`,
     siteName: 'SafeBaby',
     images: [

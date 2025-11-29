@@ -12,38 +12,130 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Known manufacturer disclosure URLs (as they become available)
-// AB 899 became effective January 1, 2022
+// Known manufacturer disclosure URLs - Updated November 2025
+// AB 899 became effective January 1, 2025
+// Reference: California Assembly Bill 899 requires baby food manufacturers to disclose heavy metal test results
+//
+// TIER SYSTEM:
+// - TIER 1: Excellent transparency, scrapeable HTML/JSON
+// - TIER 2: Moderate transparency, form-based or complex scraping
+// - TIER 3: Poor transparency, QR codes or barriers (NOT SCRAPEABLE)
+//
 const MANUFACTURER_URLS = {
-  gerber: {
-    name: "Gerber Products Company",
-    url: "https://www.gerber.com/heavy-metal-testing", // Example URL
-    enabled: false, // Set to true when URL is confirmed
-    parser: parseGerberData
-  },
-  beechnut: {
-    name: "Beech-Nut Nutrition Company",
-    url: "https://www.beechnut.com/ab899-disclosure", // Example URL
-    enabled: false,
-    parser: parseBeechNutData
-  },
-  happybaby: {
-    name: "Nurture Inc. (Happy Baby)",
-    url: "https://www.happyfamilyorganics.com/heavy-metals", // Example URL
-    enabled: false,
-    parser: parseHappyBabyData
-  },
+  // ============================================================
+  // TIER 1: EXCELLENT TRANSPARENCY (Scrapeable)
+  // ============================================================
+
   plum: {
     name: "Plum Organics",
-    url: "https://www.plumorganics.com/quality-safety", // Example URL
-    enabled: false,
+    url: "https://www.plumorganics.com/heavy-metals-test-results-for-pouches/",
+    tier: 1,
+    enabled: false, // Use dedicated scrape-plum-organics.js instead
+    format: "HTML table",
+    products: "~45 unique products, 936+ batch results",
+    dataFields: "Lead, Mercury, Arsenic, Cadmium (ppb)",
+    hasUPC: true,
+    notes: "BEST SOURCE - Use scrape-plum-organics.js for this",
     parser: parsePlumData
   },
+
+  littlespoon: {
+    name: "Little Spoon",
+    url: "https://www.littlespoon.com/our-standards",
+    tier: 1,
+    enabled: false, // Form scraping script needed
+    format: "Interactive dashboard per product",
+    products: "50+ Babyblends",
+    dataFields: "All 4 metals + 500+ other contaminants",
+    hasUPC: false, // Need to verify
+    notes: "EU-aligned strict standards. Manual scraping required.",
+    parser: parseLittleSpoonData
+  },
+
   earthsbest: {
     name: "Earth's Best Organic",
-    url: "https://www.earthsbest.com/safety-testing", // Example URL
-    enabled: false,
+    url: "https://www.earthsbest.com/producttesting",
+    tier: 1,
+    enabled: false, // Form scraping script needed
+    format: "HTML form-based lookup",
+    products: "~40 products",
+    dataFields: "All 4 metals with exact values (no '<' symbols)",
+    hasUPC: false, // Need to verify
+    notes: "Most accurate reporting - exact ppb values. Form scraping required.",
     parser: parseEarthsBestData
+  },
+
+  // ============================================================
+  // TIER 2: MODERATE TRANSPARENCY (Complex scraping)
+  // ============================================================
+
+  gerber: {
+    name: "Gerber Products Company",
+    url: "https://www.gerber.com/tet",
+    tier: 2,
+    enabled: false, // Form scraping script needed
+    format: "Searchable database",
+    products: "136+ products",
+    dataFields: "All 4 metals (some use '<X' format)",
+    hasUPC: true, // Likely available
+    notes: "Uses ambiguous '<' reporting. Form scraping required.",
+    parser: parseGerberData
+  },
+
+  onceuponafarm: {
+    name: "Once Upon a Farm",
+    url: "https://onceuponafarmorganics.com/pages/our-standards",
+    tier: 2,
+    enabled: false, // Complex - lot code required
+    format: "QR codes + lot number entry",
+    products: "100+ products",
+    dataFields: "All 4 metals",
+    hasUPC: false, // Via lot number only
+    notes: "Complex - requires lot code from physical product",
+    parser: parseOnceUponAFarmData
+  },
+
+  // ============================================================
+  // TIER 3: POOR TRANSPARENCY (NOT SCRAPEABLE)
+  // ============================================================
+
+  beechnut: {
+    name: "Beech-Nut Nutrition Company",
+    url: "https://www.beechnut.com",
+    tier: 3,
+    enabled: false, // NOT SCRAPEABLE
+    format: "QR code required",
+    products: "Unknown",
+    dataFields: "Unknown",
+    hasUPC: false,
+    notes: "NOT SCRAPEABLE - Physical product + QR + codes + CAPTCHA required",
+    parser: parseBeechNutData
+  },
+
+  happybaby: {
+    name: "Happy Family Organics (Happy Baby)",
+    url: "https://www.happyfamilyorganics.com",
+    tier: 3,
+    enabled: false, // NOT SCRAPEABLE - AB 899 VIOLATION
+    format: "QR code required",
+    products: "Unknown",
+    dataFields: "Unknown",
+    hasUPC: false,
+    notes: "NOT SCRAPEABLE - QR code + removes data after best-by date (AB 899 VIOLATION)",
+    parser: parseHappyBabyData
+  },
+
+  sprout: {
+    name: "Sprout Organics",
+    url: "https://sproutorganics.com",
+    tier: 3,
+    enabled: false, // NOT SCRAPEABLE
+    format: "QR code + lot code required",
+    products: "Unknown",
+    dataFields: "Unknown",
+    hasUPC: false,
+    notes: "NOT SCRAPEABLE - Lot code from physical product required",
+    parser: parseSproutData
   }
 };
 
@@ -143,6 +235,48 @@ function parseEarthsBestData(html) {
   const products = [];
 
   // TODO: Implement Earth's Best specific parsing
+  // URL: https://www.earthsbest.com/producttesting
+  // Format: HTML form-based lookup
+  // Notes: Reports exact ppb values (no '<' symbols) - most accurate data
+  // Products: ~40 products
+
+  return products;
+}
+
+function parseLittleSpoonData(html) {
+  console.log('Parsing Little Spoon data...');
+  const products = [];
+
+  // TODO: Implement Little Spoon specific parsing
+  // URL: https://www.littlespoon.com/our-standards
+  // Format: Interactive dashboard per product
+  // Notes: EU-aligned strict standards, tests 500+ contaminants
+  // Products: 50+ Babyblends
+
+  return products;
+}
+
+function parseOnceUponAFarmData(html) {
+  console.log('Parsing Once Upon a Farm data...');
+  const products = [];
+
+  // TODO: Implement Once Upon a Farm specific parsing
+  // URL: https://onceuponafarmorganics.com/pages/our-standards
+  // Format: QR codes + lot number entry
+  // Notes: Requires lot code from physical product - complex scraping
+  // Products: 100+ products
+
+  return products;
+}
+
+function parseSproutData(html) {
+  console.log('Parsing Sprout Organics data...');
+  const products = [];
+
+  // NOT SCRAPEABLE - Requires lot code from physical product
+  // URL: https://sproutorganics.com
+  console.log('  ⚠️  Sprout Organics requires lot codes from physical products');
+  console.log('  ⚠️  This source is NOT scrapeable without product access');
 
   return products;
 }
@@ -407,6 +541,48 @@ async function scrapeAll() {
   console.log('Update MANUFACTURER_URLS with actual disclosure URLs when available.');
 }
 
+// Show manufacturer status
+function showStatus() {
+  console.log('SafeBaby AB 899 Manufacturer Status');
+  console.log('='.repeat(70));
+  console.log('');
+
+  const tiers = {
+    1: { name: 'TIER 1: EXCELLENT TRANSPARENCY', color: '✅', manufacturers: [] },
+    2: { name: 'TIER 2: MODERATE TRANSPARENCY', color: '⚠️', manufacturers: [] },
+    3: { name: 'TIER 3: POOR TRANSPARENCY', color: '❌', manufacturers: [] }
+  };
+
+  for (const [id, m] of Object.entries(MANUFACTURER_URLS)) {
+    tiers[m.tier].manufacturers.push({ id, ...m });
+  }
+
+  for (const [tier, data] of Object.entries(tiers)) {
+    console.log(`${data.color} ${data.name}`);
+    console.log('-'.repeat(70));
+    for (const m of data.manufacturers) {
+      const status = m.enabled ? '🟢 ENABLED' : '⚫ disabled';
+      console.log(`  ${m.id.padEnd(15)} ${m.name.padEnd(30)} ${status}`);
+      console.log(`                  URL: ${m.url}`);
+      console.log(`                  Products: ${m.products} | UPC: ${m.hasUPC ? 'Yes' : 'No'}`);
+      if (m.notes) {
+        console.log(`                  Notes: ${m.notes}`);
+      }
+      console.log('');
+    }
+  }
+
+  console.log('='.repeat(70));
+  console.log('SCRAPING PRIORITY:');
+  console.log('  1. Plum Organics   → Run scrape-plum-organics.js (~45 products)');
+  console.log('  2. Earth\'s Best    → Form scraping script needed (~40 products)');
+  console.log('  3. Gerber          → Form scraping script needed (~136 products)');
+  console.log('  4. Little Spoon    → Dashboard scraping needed (~50 products)');
+  console.log('');
+  console.log('Estimated total from scrapeable sources: ~270 new products with REAL lab data');
+  console.log('');
+}
+
 // Command line interface
 const args = process.argv.slice(2);
 
@@ -422,17 +598,35 @@ if (args.length === 0) {
   console.log('SafeBaby AB 899 Web Scraper');
   console.log('');
   console.log('Usage:');
-  console.log('  node scripts/scrape-ab899.js [manufacturer]');
+  console.log('  node scripts/scrape-ab899.js [command|manufacturer]');
   console.log('');
-  console.log('Arguments:');
-  console.log('  manufacturer    Scrape specific manufacturer (gerber, beechnut, happybaby, plum, earthsbest)');
-  console.log('                  Omit to scrape all enabled manufacturers');
+  console.log('Commands:');
+  console.log('  --status, -s    Show all manufacturers and their transparency status');
+  console.log('  --help, -h      Show this help message');
+  console.log('');
+  console.log('Manufacturers (TIER 1 - Scrapeable):');
+  console.log('  plum            Plum Organics (use scrape-plum-organics.js instead)');
+  console.log('  littlespoon     Little Spoon');
+  console.log('  earthsbest      Earth\'s Best Organic');
+  console.log('');
+  console.log('Manufacturers (TIER 2 - Complex):');
+  console.log('  gerber          Gerber Products Company');
+  console.log('  onceuponafarm   Once Upon a Farm');
+  console.log('');
+  console.log('Manufacturers (TIER 3 - NOT Scrapeable):');
+  console.log('  beechnut        Beech-Nut (QR code required)');
+  console.log('  happybaby       Happy Family Organics (QR code + data removed after best-by)');
+  console.log('  sprout          Sprout Organics (lot code required)');
   console.log('');
   console.log('Examples:');
   console.log('  node scripts/scrape-ab899.js              # Scrape all enabled');
+  console.log('  node scripts/scrape-ab899.js --status     # Show manufacturer status');
   console.log('  node scripts/scrape-ab899.js gerber       # Scrape only Gerber');
   console.log('');
-  console.log('Note: Most URLs are disabled by default. Enable in MANUFACTURER_URLS when confirmed.');
+  console.log('Note: Use scrape-plum-organics.js for Plum Organics data.');
+  process.exit(0);
+} else if (args[0] === '--status' || args[0] === '-s') {
+  showStatus();
   process.exit(0);
 } else {
   // Specific manufacturer

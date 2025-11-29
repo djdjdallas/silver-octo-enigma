@@ -414,7 +414,7 @@ export default function MetalDetectorAppPage() {
                 <Icons.arrowRight className="w-5 h-5 text-gray-600 transform group-open:rotate-90 transition-transform" />
               </summary>
               <p className="mt-4 text-gray-700">
-                When you tap the scan button, your phone camera activates and reads the UPC barcode on baby food packaging. The app instantly matches the barcode to our database of 500+ tested products and displays heavy metal levels within seconds.
+                When you tap the scan button, your phone camera activates and reads the UPC barcode on baby food packaging. The app instantly matches the barcode to our database of 220+ verified lab-tested products and displays heavy metal levels within seconds.
               </p>
             </details>
             <details className="bg-white rounded-2xl p-6 group cursor-pointer shadow-md">

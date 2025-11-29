@@ -10,8 +10,8 @@ export const metadata = {
 
 export default function AboutPage() {
   const stats = [
-    { number: '500+', label: 'Products Analyzed' },
-    { number: '100+', label: 'Brands Tracked' },
+    { number: '220+', label: 'Verified Products' },
+    { number: '60+', label: 'Brands Tracked' },
     { number: '50,000+', label: 'Parents Helped' },
     { number: '24/7', label: 'Updated Data' },
   ];

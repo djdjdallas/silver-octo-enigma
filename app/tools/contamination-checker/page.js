@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 
 export const metadata = {
   title: 'Baby Food Contamination Checker | Instant Heavy Metals Report',
-  description: 'Check baby food for contamination instantly. Scan or search 500+ products for lead, arsenic, cadmium & mercury levels. Free safety checker.',
+  description: 'Check baby food for contamination instantly. Scan or search 220+ verified products for lead, arsenic, cadmium & mercury levels. Free safety checker.',
   keywords: [
     'baby food contamination checker',
     'check baby food contamination',
@@ -15,7 +15,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Baby Food Contamination Checker | Instant Heavy Metals Report',
-    description: 'Check baby food for contamination instantly. Scan or search 500+ products for heavy metals.',
+    description: 'Check baby food for contamination instantly. Scan or search 220+ verified products for heavy metals.',
     url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://safebaby.com'}/tools/contamination-checker`,
     siteName: 'SafeBaby',
     type: 'website',
@@ -57,8 +57,8 @@ export default function ContaminationCheckerPage() {
         <section className="mb-12">
           <div className="grid md:grid-cols-3 gap-6">
             <Card className="p-6 text-center bg-white rounded-3xl shadow-lg">
-              <div className="text-4xl font-bold text-primary mb-2">500+</div>
-              <div className="text-gray-600">Products Tested</div>
+              <div className="text-4xl font-bold text-primary mb-2">220+</div>
+              <div className="text-gray-600">Verified Products</div>
             </Card>
             <Card className="p-6 text-center bg-white rounded-3xl shadow-lg">
               <div className="text-4xl font-bold text-coral mb-2">4</div>

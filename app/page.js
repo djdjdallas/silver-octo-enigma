@@ -16,9 +16,9 @@ import {
 
 export const metadata = {
   title:
-    "SafeBaby - Baby Food Heavy Metals Scanner | Check 500+ Products for Lead & Arsenic",
+    "SafeBaby - Baby Food Heavy Metals Scanner | Check 220+ Products for Lead & Arsenic",
   description:
-    "Scan baby food for heavy metals instantly. Check lead, arsenic, cadmium & mercury levels in Gerber, Beech-Nut, Happy Baby & 500+ products. Free safety ratings.",
+    "Scan baby food for heavy metals instantly. Check lead, arsenic, cadmium & mercury levels in Gerber, Beech-Nut, Plum Organics & 220+ verified products. Free safety ratings.",
   keywords: [
     "baby food heavy metals",
     "baby food scanner",
@@ -30,7 +30,7 @@ export const metadata = {
   openGraph: {
     title: "SafeBaby - Baby Food Heavy Metals Scanner",
     description:
-      "Scan baby food for heavy metals. Get instant safety ratings for 500+ products.",
+      "Scan baby food for heavy metals. Get instant safety ratings for 220+ verified products.",
     url: process.env.NEXT_PUBLIC_APP_URL || "https://safebaby.io",
     siteName: "SafeBaby",
     images: [
